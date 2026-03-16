@@ -19,7 +19,7 @@ export function BudgetForm() {
       </div>
       <label>
         <span>예산 이름</span>
-        <input name="name" placeholder="예: 2026년 1학기 학급 운영비" required />
+        <input name="name" placeholder="예: 2026년 1분기 생활비" required />
       </label>
       <label>
         <span>총 예산</span>
@@ -27,7 +27,7 @@ export function BudgetForm() {
       </label>
       <label>
         <span>기간</span>
-        <input name="period_label" placeholder="예: 2026년 1학기" />
+        <input name="period_label" placeholder="예: 2026년 1분기" />
       </label>
       <button type="submit" className="primary-button">
         저장
@@ -45,9 +45,9 @@ export function CategoryForm({ budgets }: { budgets: Option[] }) {
       </div>
       <label>
         <span>예산</span>
-        <select name="budget_id" required defaultValue="">
+        <select name="budget_id" required defaultValue="" disabled={budgets.length === 0}>
           <option value="" disabled>
-            예산 선택
+            {budgets.length === 0 ? "먼저 예산을 추가해주세요" : "예산 선택"}
           </option>
           {budgets.map((budget) => (
             <option key={budget.id} value={budget.id}>
@@ -58,7 +58,7 @@ export function CategoryForm({ budgets }: { budgets: Option[] }) {
       </label>
       <label>
         <span>항목 이름</span>
-        <input name="name" placeholder="예: 교실 소모품" required />
+        <input name="name" placeholder="예: 교통비" required />
       </label>
       <label>
         <span>배정 금액</span>
@@ -86,7 +86,7 @@ export function ExpenseForm({ categories }: { categories: Option[] }) {
         <span>예산 항목</span>
         <select name="category_id" required defaultValue="" disabled={categories.length === 0}>
           <option value="" disabled>
-            {categories.length === 0 ? "먼저 예산 항목을 추가하세요" : "항목 선택"}
+            {categories.length === 0 ? "먼저 예산 항목을 추가해주세요" : "항목 선택"}
           </option>
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
@@ -97,7 +97,7 @@ export function ExpenseForm({ categories }: { categories: Option[] }) {
       </label>
       <label>
         <span>지출명</span>
-        <input name="title" placeholder="예: 활동지 인쇄" required />
+        <input name="title" placeholder="예: 주말 외식" required />
       </label>
       <label>
         <span>금액</span>
@@ -127,7 +127,7 @@ export function WishlistForm({ categories }: { categories: Option[] }) {
       </div>
       <label>
         <span>물건 이름</span>
-        <input name="title" placeholder="예: 라벨 프린터" required />
+        <input name="title" placeholder="예: 여행용 캐리어" required />
       </label>
       <label>
         <span>상품 링크</span>
@@ -145,7 +145,7 @@ export function WishlistForm({ categories }: { categories: Option[] }) {
         <span>연결 예산 항목</span>
         <select name="category_id" defaultValue="" disabled={categories.length === 0}>
           <option value="">
-            {categories.length === 0 ? "먼저 예산 항목을 추가하세요" : "선택 안 함"}
+            {categories.length === 0 ? "먼저 예산 항목을 추가해주세요" : "선택 안 함"}
           </option>
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
@@ -154,7 +154,10 @@ export function WishlistForm({ categories }: { categories: Option[] }) {
           ))}
         </select>
       </label>
-      <p className="field-help">예산만 추가해선 안 보이고, 예산 안에 항목을 추가해야 여기에 나타납니다.</p>
+      <p className="field-help">
+        예산만 추가하면 여기 드롭다운에는 보이지 않고, 예산 안에 항목을 추가해야 선택할 수
+        있습니다.
+      </p>
       <label>
         <span>우선순위</span>
         <select name="priority" defaultValue="medium">
