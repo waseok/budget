@@ -1,8 +1,10 @@
 "use client";
 
-import { useActionState, useTransition, useState } from "react";
+import { useActionState, useTransition, useState, useEffect, useRef } from "react";
 
 import { signIn, signUp, getSecurityQuestion, resetPassword } from "@/app/actions";
+
+const SAVED_ID_KEY = "budget_saved_username";
 
 type Mode = "signin" | "signup" | "forgot";
 
@@ -20,6 +22,23 @@ export function AuthPanel() {
   const [signInState, signInAction, signInPending] = useActionState(signIn, null);
   const [signUpState, signUpAction, signUpPending] = useActionState(signUp, null);
   const [resetState, resetAction, resetPending] = useActionState(resetPassword, null);
+
+  // 아이디 저장
+  const [savedUsername, setSavedUsername] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const usernameRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(SAVED_ID_KEY);
+    if (saved) { setSavedUsername(saved); setRememberMe(true); }
+  }, []);
+
+  function handleSignInSubmit(e: React.FormEvent<HTMLFormElement>) {
+    const fd = new FormData(e.currentTarget);
+    const username = (fd.get("username") as string).trim();
+    if (rememberMe) localStorage.setItem(SAVED_ID_KEY, username);
+    else localStorage.removeItem(SAVED_ID_KEY);
+  }
 
   // Forgot password — 2-step flow managed with local state
   const [forgotStep, setForgotStep] = useState<1 | 2>(1);
@@ -84,15 +103,37 @@ export function AuthPanel() {
 
       {/* ── 로그인 ── */}
       {mode === "signin" && (
-        <form action={signInAction} className="auth-form">
+        <form action={signInAction} className="auth-form" onSubmit={handleSignInSubmit}>
           <label>
             <span>아이디</span>
-            <input type="text" name="username" placeholder="아이디 입력" required autoComplete="username" />
+            <input
+              ref={usernameRef}
+              type="text"
+              name="username"
+              placeholder="아이디 입력"
+              required
+              autoComplete="username"
+              defaultValue={savedUsername}
+            />
           </label>
           <label>
             <span>비밀번호</span>
             <input type="password" name="password" placeholder="비밀번호 입력" required autoComplete="current-password" />
           </label>
+          <div className="auth-options">
+            <label className="auth-check">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
+              <span>아이디 저장</span>
+            </label>
+            <label className="auth-check">
+              <input type="checkbox" name="auto_login" />
+              <span>자동 로그인</span>
+            </label>
+          </div>
           <button type="submit" className="primary-button auth-submit" disabled={signInPending}>
             {signInPending ? "로그인 중..." : "로그인하기"}
           </button>
