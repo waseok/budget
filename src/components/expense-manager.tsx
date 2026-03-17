@@ -60,7 +60,7 @@ export function ExpenseManager({
               </label>
               <label>
                 <span>금액</span>
-                <input name="amount" type="number" min="1" step="1000" defaultValue={expense.amount} required />
+                <input name="amount" type="number" min="1" step="1" defaultValue={expense.amount} required />
               </label>
               <label>
                 <span>지출일</span>

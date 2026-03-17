@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+
 import {
   createBudget,
   createCategory,
@@ -76,7 +80,20 @@ export function CategoryForm({ budgets }: { budgets: Option[] }) {
   );
 }
 
-export function ExpenseForm({ categories }: { categories: Option[] }) {
+type BudgetWithCategories = {
+  id: string;
+  name: string;
+  categories: Option[];
+};
+
+export function ExpenseForm({ budgets }: { budgets: BudgetWithCategories[] }) {
+  const [selectedBudgetId, setSelectedBudgetId] = useState("");
+
+  const filteredCategories =
+    budgets.find((b) => b.id === selectedBudgetId)?.categories ?? [];
+
+  const noBudgets = budgets.length === 0;
+
   return (
     <form action={createExpense} className="form-card clean-card">
       <div className="form-heading">
@@ -84,15 +101,33 @@ export function ExpenseForm({ categories }: { categories: Option[] }) {
         <h2>지출 추가</h2>
       </div>
       <label>
-        <span>예산 항목</span>
-        <select name="category_id" required defaultValue="" disabled={categories.length === 0}>
+        <span>예산</span>
+        <select
+          value={selectedBudgetId}
+          onChange={(e) => setSelectedBudgetId(e.target.value)}
+          disabled={noBudgets}
+          required
+        >
           <option value="" disabled>
-            {categories.length === 0 ? "먼저 예산 항목을 추가해주세요" : "항목 선택"}
+            {noBudgets ? "먼저 예산을 추가해주세요" : "예산 선택"}
           </option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
+          {budgets.map((b) => (
+            <option key={b.id} value={b.id}>{b.name}</option>
+          ))}
+        </select>
+      </label>
+      <label>
+        <span>세부 항목</span>
+        <select name="category_id" required defaultValue="" disabled={!selectedBudgetId}>
+          <option value="" disabled>
+            {!selectedBudgetId
+              ? "예산을 먼저 선택하세요"
+              : filteredCategories.length === 0
+              ? "이 예산에 세부 항목이 없습니다"
+              : "세부 항목 선택"}
+          </option>
+          {filteredCategories.map((c) => (
+            <option key={c.id} value={c.id}>{c.name}</option>
           ))}
         </select>
       </label>
@@ -102,7 +137,7 @@ export function ExpenseForm({ categories }: { categories: Option[] }) {
       </label>
       <label>
         <span>금액</span>
-        <input name="amount" type="number" min="1" step="1000" placeholder="25000" required />
+        <input name="amount" type="number" min="1" step="1" placeholder="65800" required />
       </label>
       <label>
         <span>지출일</span>
