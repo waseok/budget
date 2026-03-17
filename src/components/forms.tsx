@@ -8,6 +8,7 @@ import {
   createExpense,
   createWishlistItem,
 } from "@/app/actions";
+import { formatCurrency } from "@/lib/format";
 
 type Option = {
   id: string;
@@ -83,16 +84,28 @@ export function CategoryForm({ budgets }: { budgets: Option[] }) {
 type BudgetWithCategories = {
   id: string;
   name: string;
-  categories: Option[];
+  totalAmount: number;
+  spentAmount: number;
+  categories: Array<{
+    id: string;
+    name: string;
+    allocatedAmount: number;
+    spentAmount: number;
+  }>;
 };
 
 export function ExpenseForm({ budgets }: { budgets: BudgetWithCategories[] }) {
   const [selectedBudgetId, setSelectedBudgetId] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
 
-  const filteredCategories =
-    budgets.find((b) => b.id === selectedBudgetId)?.categories ?? [];
+  const selectedBudget = budgets.find((b) => b.id === selectedBudgetId);
+  const filteredCategories = selectedBudget?.categories ?? [];
+  const selectedCategory = filteredCategories.find((c) => c.id === selectedCategoryId);
 
   const noBudgets = budgets.length === 0;
+
+  const budgetBalance = selectedBudget ? selectedBudget.totalAmount - selectedBudget.spentAmount : null;
+  const categoryBalance = selectedCategory ? selectedCategory.allocatedAmount - selectedCategory.spentAmount : null;
 
   return (
     <form action={createExpense} className="form-card clean-card">
@@ -104,7 +117,7 @@ export function ExpenseForm({ budgets }: { budgets: BudgetWithCategories[] }) {
         <span>예산</span>
         <select
           value={selectedBudgetId}
-          onChange={(e) => setSelectedBudgetId(e.target.value)}
+          onChange={(e) => { setSelectedBudgetId(e.target.value); setSelectedCategoryId(""); }}
           disabled={noBudgets}
           required
         >
@@ -116,9 +129,30 @@ export function ExpenseForm({ budgets }: { budgets: BudgetWithCategories[] }) {
           ))}
         </select>
       </label>
+      {selectedBudget && (
+        <div className="balance-info">
+          <div className="balance-info-row">
+            <span>예산 잔액</span>
+            <strong style={{ color: budgetBalance !== null && budgetBalance < 0 ? "var(--danger)" : "var(--blue)" }}>
+              {formatCurrency(budgetBalance ?? 0)}
+            </strong>
+          </div>
+          <div className="balance-meta">
+            <span>전체 {formatCurrency(selectedBudget.totalAmount)}</span>
+            <span>·</span>
+            <span>지출 {formatCurrency(selectedBudget.spentAmount)}</span>
+          </div>
+        </div>
+      )}
       <label>
         <span>세부 항목</span>
-        <select name="category_id" required defaultValue="" disabled={!selectedBudgetId}>
+        <select
+          name="category_id"
+          value={selectedCategoryId}
+          onChange={(e) => setSelectedCategoryId(e.target.value)}
+          required
+          disabled={!selectedBudgetId}
+        >
           <option value="" disabled>
             {!selectedBudgetId
               ? "예산을 먼저 선택하세요"
@@ -131,6 +165,21 @@ export function ExpenseForm({ budgets }: { budgets: BudgetWithCategories[] }) {
           ))}
         </select>
       </label>
+      {selectedCategory && (
+        <div className="balance-info">
+          <div className="balance-info-row">
+            <span>항목 잔액</span>
+            <strong style={{ color: categoryBalance !== null && categoryBalance < 0 ? "var(--danger)" : "var(--green)" }}>
+              {formatCurrency(categoryBalance ?? 0)}
+            </strong>
+          </div>
+          <div className="balance-meta">
+            <span>배정 {formatCurrency(selectedCategory.allocatedAmount)}</span>
+            <span>·</span>
+            <span>지출 {formatCurrency(selectedCategory.spentAmount)}</span>
+          </div>
+        </div>
+      )}
       <label>
         <span>지출명</span>
         <input name="title" placeholder="예: 주말 외식" required />

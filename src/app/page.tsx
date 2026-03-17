@@ -162,7 +162,18 @@ export default async function HomePage() {
                 <div className="quick-forms">
                   <BudgetForm />
                   <CategoryForm budgets={budgetOptions} />
-                  <ExpenseForm budgets={data.budgets.map((b) => ({ id: b.id, name: b.name, categories: b.categories.map((c) => ({ id: c.id, name: c.name })) }))} />
+                  <ExpenseForm budgets={data.budgets.map((b) => ({
+                    id: b.id,
+                    name: b.name,
+                    totalAmount: b.totalAmount,
+                    spentAmount: b.categories.reduce((sum, c) => sum + c.spentAmount, 0),
+                    categories: b.categories.map((c) => ({
+                      id: c.id,
+                      name: c.name,
+                      allocatedAmount: c.allocatedAmount,
+                      spentAmount: c.spentAmount,
+                    })),
+                  }))} />
                   <WishlistForm categories={categories.map((item) => ({ id: item.id, name: item.name }))} />
                 </div>
               </article>
