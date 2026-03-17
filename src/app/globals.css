@@ -1,17 +1,17 @@
 :root {
-  --bg: #f7f3ed;
+  --bg: #f8fafc;
   --surface: #ffffff;
-  --surface-soft: #f2ece4;
-  --line: #e5ddd2;
-  --text: #25180f;
-  --muted: #756657;
+  --surface-soft: #f1f5f9;
+  --line: #e2e8f0;
+  --text: #0f172a;
+  --muted: #64748b;
   --blue: #2563eb;
-  --orange: #ea580c;
-  --green: #0f766e;
+  --orange: #f97316;
+  --green: #059669;
   --pink: #db2777;
-  --danger: #b42318;
-  --shadow: 0 12px 30px rgba(44, 29, 13, 0.06);
-  --radius: 20px;
+  --danger: #dc2626;
+  --shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.04);
+  --radius: 16px;
 }
 
 * {
@@ -64,12 +64,13 @@ textarea {
 
 .sidebar-title {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
+  color: var(--blue);
 }
 
 .nav-list {
   display: grid;
-  gap: 8px;
+  gap: 4px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -80,21 +81,22 @@ textarea {
   align-items: center;
   gap: 12px;
   padding: 11px 14px;
-  border-radius: 12px;
+  border-radius: 10px;
   color: var(--muted);
   font-weight: 500;
   font-size: 0.95rem;
   white-space: nowrap;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.12s, color 0.12s;
 }
 
-.nav-link:hover,
-.nav-link.active {
+.nav-link:hover {
   background: var(--surface-soft);
   color: var(--text);
 }
 
 .nav-link.active {
+  background: #eff6ff;
+  color: var(--blue);
   font-weight: 700;
 }
 
@@ -131,9 +133,9 @@ textarea {
 .hero-simple h1 {
   margin: 0;
   max-width: none;
-  font-size: clamp(2.2rem, 4vw, 3.3rem);
-  line-height: 1.05;
-  letter-spacing: -0.04em;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
 }
 
 .hero-subtle,
@@ -143,10 +145,10 @@ textarea {
 
 .eyebrow {
   margin: 0;
-  color: var(--muted);
-  font-size: 0.8rem;
+  color: var(--blue);
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
@@ -208,13 +210,13 @@ textarea {
 
 .summary-card {
   display: grid;
-  gap: 10px;
+  gap: 12px;
 }
 
 .summary-head {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .summary-icon {
@@ -233,18 +235,22 @@ textarea {
 }
 
 .tone-blue .summary-icon {
+  background: #eff6ff;
   color: var(--blue);
 }
 
 .tone-orange .summary-icon {
+  background: #fff7ed;
   color: var(--orange);
 }
 
 .tone-green .summary-icon {
+  background: #f0fdf4;
   color: var(--green);
 }
 
 .tone-pink .summary-icon {
+  background: #fdf2f8;
   color: var(--pink);
 }
 
@@ -322,7 +328,7 @@ textarea {
 }
 
 .donut-track {
-  stroke: #ece4da;
+  stroke: #e2e8f0;
 }
 
 .donut-progress {
@@ -385,11 +391,11 @@ textarea {
 }
 
 .budget-badge {
-  padding: 8px 12px;
+  padding: 6px 12px;
   border-radius: 999px;
-  background: var(--surface-soft);
-  color: var(--text);
-  font-size: 0.9rem;
+  background: #eff6ff;
+  color: var(--blue);
+  font-size: 0.88rem;
   font-weight: 700;
 }
 
@@ -461,18 +467,27 @@ textarea {
 .budget-edit-form span,
 .auth-form span {
   font-size: 0.9rem;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 input,
 select,
 textarea {
   width: 100%;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
+  padding: 11px 14px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
   background: #fff;
   color: var(--text);
+  outline: none;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
 textarea {
@@ -493,16 +508,16 @@ textarea {
 }
 
 .color-dot {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
 }
 
 .progress-track {
   overflow: hidden;
-  height: 12px;
+  height: 8px;
   border-radius: 999px;
-  background: #ece4da;
+  background: #e2e8f0;
 }
 
 .progress-fill {
@@ -533,7 +548,7 @@ textarea {
 .wishlist-card {
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 14px;
   background: #fff;
 }
 
@@ -559,9 +574,9 @@ textarea {
 
 .priority-pill {
   width: fit-content;
-  padding: 6px 10px;
+  padding: 4px 10px;
   border-radius: 999px;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 700;
 }
 
@@ -571,8 +586,8 @@ textarea {
 }
 
 .priority-medium {
-  background: #fef3c7;
-  color: #92400e;
+  background: #fef9c3;
+  color: #854d0e;
 }
 
 .priority-low {
@@ -587,16 +602,27 @@ textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
-  padding: 10px 14px;
+  min-height: 42px;
+  padding: 10px 16px;
   border: 0;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.12s, background 0.12s;
 }
 
 .primary-button {
-  background: var(--text);
+  background: var(--blue);
   color: #fff;
+}
+
+.primary-button:hover {
+  opacity: 0.88;
+}
+
+.primary-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .secondary-button {
@@ -604,9 +630,17 @@ textarea {
   color: var(--text);
 }
 
+.secondary-button:hover {
+  background: #e2e8f0;
+}
+
 .danger-button {
-  background: #fff0ee;
+  background: #fef2f2;
   color: var(--danger);
+}
+
+.danger-button:hover {
+  background: #fee2e2;
 }
 
 .simple-page {
@@ -614,30 +648,46 @@ textarea {
   min-height: 100vh;
   place-items: center;
   padding: 24px;
+  background: var(--bg);
 }
 
 .auth-panel {
-  width: min(640px, 100%);
+  width: min(480px, 100%);
   display: grid;
-  gap: 16px;
+  gap: 20px;
+}
+
+.auth-copy {
+  display: grid;
+  gap: 6px;
+}
+
+.auth-copy h1 {
+  margin: 0;
+  font-size: 2rem;
+  letter-spacing: -0.02em;
 }
 
 .auth-toggle {
   display: inline-flex;
-  gap: 8px;
-  padding: 6px;
-  border-radius: 999px;
+  gap: 6px;
+  padding: 5px;
+  border-radius: 12px;
   background: var(--surface-soft);
+  width: fit-content;
 }
 
 .toggle-button {
   background: transparent;
   color: var(--muted);
+  border-radius: 8px;
+  min-height: 36px;
+  font-size: 0.9rem;
 }
 
 .toggle-button.active {
-  background: #fff;
-  color: var(--text);
+  background: var(--blue);
+  color: #fff;
 }
 
 .auth-form {
@@ -647,14 +697,18 @@ textarea {
 
 .auth-submit {
   width: 100%;
+  min-height: 46px;
+  font-size: 1rem;
 }
 
 .success-message {
-  color: #166534;
+  color: var(--green);
+  font-size: 0.9rem;
 }
 
 .error-message {
   color: var(--danger);
+  font-size: 0.9rem;
 }
 
 @media (max-width: 1100px) {
@@ -683,7 +737,7 @@ textarea {
 
   .hero-simple h1 {
     max-width: 100%;
-    font-size: 2.5rem;
+    font-size: 2rem;
   }
 
   .budget-item-top,

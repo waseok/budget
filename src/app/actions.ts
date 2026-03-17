@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
 function requiredString(formData: FormData, key: string) {
@@ -64,28 +65,34 @@ export async function signIn(
 }
 
 export async function signUp(
-  _prevState: { error: string; message: string } | null,
+  _prevState: { error: string } | null,
   formData: FormData,
-): Promise<{ error: string; message: string }> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({
-    email: requiredString(formData, "email"),
-    password: requiredString(formData, "password"),
-    options: {
-      data: { full_name: optionalString(formData, "name") },
-    },
+): Promise<{ error: string }> {
+  const email = requiredString(formData, "email");
+  const password = requiredString(formData, "password");
+
+  // Admin API로 생성 → "Email signups are disabled" 및 이메일 인증 우회
+  const admin = createAdminClient();
+  const { error: createError } = await admin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
   });
 
-  if (error) {
-    return { error: error.message, message: "" };
+  if (createError) {
+    return { error: createError.message };
   }
 
-  if (data.session) {
-    revalidatePath("/", "layout");
-    redirect("/");
+  // 생성 직후 바로 로그인
+  const supabase = await createClient();
+  const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+
+  if (signInError) {
+    return { error: signInError.message };
   }
 
-  return { error: "", message: "인증 메일을 발송했습니다. 받은 편지함을 확인해주세요." };
+  revalidatePath("/", "layout");
+  redirect("/");
 }
 
 export async function createBudget(formData: FormData) {
