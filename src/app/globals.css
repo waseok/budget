@@ -54,6 +54,9 @@ button, input, select, textarea { font: inherit; }
 .sidebar-brand { display: grid; gap: 4px; }
 .sidebar-title { margin: 0; font-size: 1.3rem; color: var(--blue); }
 .sidebar-copy { line-height: 1.6; }
+.sidebar-auth { border-top: 1px solid var(--line); padding-top: 16px; }
+.sidebar-username { margin: 0 0 8px; font-size: 0.9rem; font-weight: 600; color: var(--text); }
+.sidebar-logout { width: 100%; }
 
 .nav-list { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
 

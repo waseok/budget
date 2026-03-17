@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { signOut } from "@/app/actions";
 import { HomeIcon, PersonIcon, ReceiptIcon, WalletIcon, WishIcon } from "@/components/icons";
 
 const navItems = [
@@ -10,10 +11,9 @@ const navItems = [
   { label: "예산", href: "/budgets", icon: WalletIcon },
   { label: "지출", href: "/expenses", icon: ReceiptIcon },
   { label: "위시리스트", href: "/wishlist", icon: WishIcon },
-  { label: "로그인", href: "/login", icon: PersonIcon },
 ];
 
-export function Sidebar() {
+export function Sidebar({ user }: { user?: string | null }) {
   const pathname = usePathname();
 
   return (
@@ -39,6 +39,20 @@ export function Sidebar() {
           })}
         </ul>
       </nav>
+      <div className="sidebar-auth">
+        {user ? (
+          <form action={signOut}>
+            <p className="sidebar-username">{user}님</p>
+            <button type="submit" className="secondary-button sidebar-logout">로그아웃</button>
+          </form>
+        ) : (
+          <Link href="/login" className="nav-link">
+            <PersonIcon className="nav-icon" />
+            <span>로그인</span>
+          </Link>
+        )}
+      </div>
     </aside>
   );
 }
+
