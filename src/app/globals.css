@@ -103,9 +103,9 @@ button, input, select, textarea { font: inherit; }
 .hero-copy { display: grid; gap: 18px; padding: 32px; }
 .hero-copy h1 {
   margin: 0;
-  font-size: clamp(1.6rem, 3vw, 2.6rem);
-  line-height: 1.2;
-  letter-spacing: -0.03em;
+  font-size: clamp(1.4rem, 2.2vw, 2rem);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
   word-break: keep-all;
 }
 
@@ -339,6 +339,8 @@ textarea { resize: vertical; }
 .auth-submit { width: 100%; min-height: 46px; font-size: 1rem; }
 .success-message { color: var(--green); font-size: 0.9rem; }
 .error-message { color: var(--danger); font-size: 0.9rem; }
+.security-question-box { padding: 14px 16px; border-radius: 10px; background: var(--surface-soft); border: 1px solid var(--line); display: grid; gap: 6px; }
+.security-question-text { margin: 0; font-weight: 600; }
 
 /* Responsive */
 @media (max-width: 1300px) {
@@ -356,7 +358,7 @@ textarea { resize: vertical; }
 @media (max-width: 720px) {
   .app-shell { padding: 16px; }
   .hero-copy, .hero-spotlight, .hero-stat-card, .panel, .clean-card, .summary-card, .budget-item { padding: 18px; }
-  .hero-copy h1 { max-width: 100%; font-size: 2.2rem; }
+  .hero-copy h1 { font-size: 1.6rem; }
   .budget-item-top, .budget-overview, .budget-actions, .manager-header,
   .wishlist-footer, .expense-row, .topbar, .hero-actions { flex-direction: column; align-items: flex-start; }
   .toolbar-row, .category-stats { grid-template-columns: 1fr; }
