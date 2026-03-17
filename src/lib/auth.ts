@@ -21,13 +21,12 @@ export function verifyPassword(plain: string, stored: string): boolean {
 // ── Session management ────────────────────────────────────────────────────
 
 const COOKIE = "budget_session";
-const DAYS = 30;
 
 export type SessionUser = { id: string; username: string; name: string };
 
-export async function createSession(userId: string): Promise<void> {
+export async function createSession(userId: string, days = 30): Promise<void> {
   const token = crypto.randomBytes(32).toString("hex");
-  const expiresAt = new Date(Date.now() + DAYS * 86_400_000).toISOString();
+  const expiresAt = new Date(Date.now() + days * 86_400_000).toISOString();
 
   const supabase = await createClient();
   await supabase.from("app_sessions").insert({ user_id: userId, token, expires_at: expiresAt });
@@ -37,7 +36,7 @@ export async function createSession(userId: string): Promise<void> {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: DAYS * 86_400,
+    maxAge: days * 86_400,
     path: "/",
   });
 }

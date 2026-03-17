@@ -133,7 +133,7 @@ export default async function HomePage() {
                     const tone = index % 3 === 0 ? "blue" : index % 3 === 1 ? "orange" : "green";
 
                     return (
-                      <article key={budget.id} className="clean-card usage-card">
+                      <article key={budget.id} className="usage-card">
                         <DonutChart
                           value={usage}
                           centerTitle={budget.name}

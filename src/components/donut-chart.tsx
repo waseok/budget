@@ -25,7 +25,7 @@ export function DonutChart({
 
   return (
     <div className="donut-card">
-      <div className="donut-wrap" style={{ boxShadow: `inset 0 0 0 1px ${palette.glow}` }}>
+      <div className="donut-wrap">
         <svg viewBox="0 0 120 120" className="donut-svg" aria-hidden="true">
           <circle cx="60" cy="60" r={radius} className="donut-track" />
           <circle
@@ -41,11 +41,11 @@ export function DonutChart({
           />
         </svg>
         <div className="donut-center">
-          <span className="donut-title">{centerTitle}</span>
           <strong>{Math.round(normalized)}%</strong>
-          {centerSubtitle ? <span>{centerSubtitle}</span> : null}
+          {centerSubtitle ? <span className="donut-subtitle">{centerSubtitle}</span> : null}
         </div>
       </div>
+      <p className="donut-name">{centerTitle}</p>
     </div>
   );
 }

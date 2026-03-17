@@ -51,7 +51,8 @@ export async function signIn(
     return { error: "아이디 또는 비밀번호가 올바르지 않습니다." };
   }
 
-  await createSession(user.id);
+  const autoLogin = formData.get("auto_login") === "on";
+  await createSession(user.id, autoLogin ? 365 : 1);
   revalidatePath("/", "layout");
   redirect("/");
 }
