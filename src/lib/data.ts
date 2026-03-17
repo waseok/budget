@@ -1,9 +1,10 @@
 import { cache } from "react";
 
+import { getSession } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export type DashboardData = {
-  user: { id: string; email: string | null } | null;
+  user: { id: string; name: string; username: string } | null;
   budgets: Array<{
     id: string;
     name: string;
@@ -38,30 +39,8 @@ export type DashboardData = {
   }>;
 };
 
-async function ensureProfile() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return null;
-  }
-
-  await supabase.from("profiles").upsert(
-    {
-      id: user.id,
-      email: user.email,
-      full_name: user.user_metadata?.full_name ?? null,
-    },
-    { onConflict: "id" },
-  );
-
-  return user;
-}
-
 export const getDashboardData = cache(async (): Promise<DashboardData> => {
-  const user = await ensureProfile();
+  const user = await getSession();
 
   if (!user) {
     return { user: null, budgets: [], expenses: [], wishlistItems: [] };
@@ -69,25 +48,37 @@ export const getDashboardData = cache(async (): Promise<DashboardData> => {
 
   const supabase = await createClient();
 
-  const [{ data: budgets }, { data: expenses }, { data: wishlistItems }] = await Promise.all([
-    supabase
-      .from("budgets")
-      .select("id, name, total_amount, period_label, budget_categories(id, name, allocated_amount, color, expenses(amount))")
-      .order("created_at", { ascending: true }),
-    supabase
-      .from("expenses")
-      .select("id, title, amount, spent_on, note, category_id, budget_categories(name)")
-      .order("spent_on", { ascending: false })
-      .limit(20),
+  const { data: budgets } = await supabase
+    .from("budgets")
+    .select(
+      "id, name, total_amount, period_label, budget_categories(id, name, allocated_amount, color, expenses(amount))",
+    )
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: true });
+
+  // Collect category IDs so we can filter expenses by ownership
+  const categoryIds =
+    budgets?.flatMap((b) => (b.budget_categories ?? []).map((c: { id: string }) => c.id)) ?? [];
+
+  const [{ data: expenses }, { data: wishlistItems }] = await Promise.all([
+    categoryIds.length > 0
+      ? supabase
+          .from("expenses")
+          .select("id, title, amount, spent_on, note, category_id, budget_categories(name)")
+          .in("category_id", categoryIds)
+          .order("spent_on", { ascending: false })
+          .limit(20)
+      : Promise.resolve({ data: [] as unknown[] }),
     supabase
       .from("wishlist_items")
       .select("id, title, memo, expected_price, priority, image_url, product_url, category_id")
+      .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(20),
   ]);
 
   return {
-    user: { id: user.id, email: user.email ?? null },
+    user: { id: user.id, name: user.name, username: user.username },
     budgets:
       budgets?.map((budget) => ({
         id: budget.id,
@@ -95,7 +86,7 @@ export const getDashboardData = cache(async (): Promise<DashboardData> => {
         totalAmount: Number(budget.total_amount),
         periodLabel: budget.period_label,
         categories:
-          budget.budget_categories?.map((category) => ({
+          budget.budget_categories?.map((category: { id: string; name: string; allocated_amount: number; color: string; expenses?: { amount: number }[] }) => ({
             id: category.id,
             name: category.name,
             allocatedAmount: Number(category.allocated_amount),
@@ -105,7 +96,7 @@ export const getDashboardData = cache(async (): Promise<DashboardData> => {
           })) ?? [],
       })) ?? [],
     expenses:
-      expenses?.map((expense) => ({
+      (expenses as Array<{ id: string; title: string; amount: number; spent_on: string; note: string | null; category_id: string; budget_categories: { name?: string } | { name?: string }[] | null }>)?.map((expense) => ({
         id: expense.id,
         title: expense.title,
         amount: Number(expense.amount),
@@ -114,11 +105,11 @@ export const getDashboardData = cache(async (): Promise<DashboardData> => {
         categoryId: expense.category_id,
         categoryName:
           Array.isArray(expense.budget_categories) && expense.budget_categories[0]
-            ? expense.budget_categories[0].name
+            ? expense.budget_categories[0].name ?? "Uncategorized"
             : (expense.budget_categories as { name?: string } | null)?.name ?? "Uncategorized",
       })) ?? [],
     wishlistItems:
-      wishlistItems?.map((item) => ({
+      (wishlistItems as Array<{ id: string; title: string; memo: string | null; expected_price: number | null; priority: "low" | "medium" | "high"; image_url: string | null; product_url: string | null; category_id: string | null }>)?.map((item) => ({
         id: item.id,
         title: item.title,
         note: item.memo,

@@ -3,14 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createSession, deleteSession, getSession, hashPassword, verifyPassword } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+
+// ── Helpers ───────────────────────────────────────────────────────────────
 
 function requiredString(formData: FormData, key: string) {
   const value = formData.get(key);
-  if (typeof value !== "string" || !value.trim()) {
-    throw new Error(`${key} 값이 필요합니다.`);
-  }
+  if (typeof value !== "string" || !value.trim()) throw new Error(`${key} 값이 필요합니다.`);
   return value.trim();
 }
 
@@ -21,45 +21,37 @@ function optionalString(formData: FormData, key: string) {
 
 function requiredNumber(formData: FormData, key: string) {
   const value = Number(requiredString(formData, key));
-  if (Number.isNaN(value) || value < 0) {
-    throw new Error(`${key} 값이 올바르지 않습니다.`);
-  }
+  if (Number.isNaN(value) || value < 0) throw new Error(`${key} 값이 올바르지 않습니다.`);
   return value;
 }
 
 async function requireUser() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  return { supabase, user };
+  const user = await getSession();
+  if (!user) redirect("/login");
+  return { supabase: await createClient(), user: user! };
 }
 
-export async function signOut() {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
-  redirect("/login");
-}
+// ── Auth ──────────────────────────────────────────────────────────────────
 
 export async function signIn(
   _prevState: { error: string } | null,
   formData: FormData,
 ): Promise<{ error: string }> {
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({
-    email: requiredString(formData, "email"),
-    password: requiredString(formData, "password"),
-  });
+  const username = requiredString(formData, "username");
+  const password = requiredString(formData, "password");
 
-  if (error) {
-    return { error: error.message };
+  const supabase = await createClient();
+  const { data: user } = await supabase
+    .from("app_users")
+    .select("id, password_hash")
+    .eq("username", username)
+    .single();
+
+  if (!user || !verifyPassword(password, user.password_hash)) {
+    return { error: "아이디 또는 비밀번호가 올바르지 않습니다." };
   }
 
+  await createSession(user.id);
   revalidatePath("/", "layout");
   redirect("/");
 }
@@ -68,38 +60,104 @@ export async function signUp(
   _prevState: { error: string } | null,
   formData: FormData,
 ): Promise<{ error: string }> {
-  const email = requiredString(formData, "email");
+  const username = requiredString(formData, "username");
+  const name = requiredString(formData, "name");
   const password = requiredString(formData, "password");
+  const confirmPassword = requiredString(formData, "confirm_password");
+  const securityQuestion = requiredString(formData, "security_question");
+  const securityAnswer = requiredString(formData, "security_answer");
+
+  if (password !== confirmPassword) return { error: "비밀번호가 일치하지 않습니다." };
+  if (password.length < 6) return { error: "비밀번호는 6자 이상이어야 합니다." };
+  if (username.length < 2) return { error: "아이디는 2자 이상이어야 합니다." };
+
   const supabase = await createClient();
 
-  // service role key가 있으면 Admin API로 (이메일 인증 우회)
-  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    try {
-      const admin = createAdminClient();
-      const { error: createError } = await admin.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
-      });
-      if (createError) return { error: createError.message };
-    } catch (e) {
-      return { error: e instanceof Error ? e.message : "회원가입 중 오류가 발생했습니다." };
-    }
+  const { data: existing } = await supabase
+    .from("app_users")
+    .select("id")
+    .eq("username", username)
+    .single();
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-    if (signInError) return { error: signInError.message };
-  } else {
-    // 표준 signup (Supabase 대시보드에서 이메일 가입 허용 필요)
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) return { error: error.message };
-    if (!data.session) {
-      return { error: "가입 완료! 이메일을 확인해 인증 링크를 클릭해주세요." };
-    }
-  }
+  if (existing) return { error: "이미 사용 중인 아이디입니다." };
 
+  const { data: user, error: insertError } = await supabase
+    .from("app_users")
+    .insert({
+      username,
+      name,
+      password_hash: hashPassword(password),
+      security_question: securityQuestion,
+      security_answer_hash: hashPassword(securityAnswer.toLowerCase().trim()),
+    })
+    .select("id")
+    .single();
+
+  if (insertError || !user) return { error: insertError?.message ?? "회원가입에 실패했습니다." };
+
+  await createSession(user.id);
   revalidatePath("/", "layout");
   redirect("/");
 }
+
+export async function signOut() {
+  await deleteSession();
+  redirect("/login");
+}
+
+export async function getSecurityQuestion(
+  _prevState: { error: string; question?: string; username?: string } | null,
+  formData: FormData,
+): Promise<{ error: string; question?: string; username?: string }> {
+  const username = requiredString(formData, "username");
+
+  const supabase = await createClient();
+  const { data: user } = await supabase
+    .from("app_users")
+    .select("security_question")
+    .eq("username", username)
+    .single();
+
+  if (!user) return { error: "존재하지 않는 아이디입니다." };
+  return { error: "", question: user.security_question, username };
+}
+
+export async function resetPassword(
+  _prevState: { error: string } | null,
+  formData: FormData,
+): Promise<{ error: string }> {
+  const username = requiredString(formData, "username");
+  const answer = requiredString(formData, "security_answer");
+  const newPassword = requiredString(formData, "new_password");
+  const confirmPassword = requiredString(formData, "confirm_password");
+
+  if (newPassword !== confirmPassword) return { error: "비밀번호가 일치하지 않습니다." };
+  if (newPassword.length < 6) return { error: "비밀번호는 6자 이상이어야 합니다." };
+
+  const supabase = await createClient();
+  const { data: user } = await supabase
+    .from("app_users")
+    .select("id, security_answer_hash")
+    .eq("username", username)
+    .single();
+
+  if (!user || !verifyPassword(answer.toLowerCase().trim(), user.security_answer_hash)) {
+    return { error: "비밀 답변이 올바르지 않습니다." };
+  }
+
+  const { error: updateError } = await supabase
+    .from("app_users")
+    .update({ password_hash: hashPassword(newPassword) })
+    .eq("id", user.id);
+
+  if (updateError) return { error: updateError.message };
+
+  await createSession(user.id);
+  revalidatePath("/", "layout");
+  redirect("/");
+}
+
+// ── Budget ────────────────────────────────────────────────────────────────
 
 export async function createBudget(formData: FormData) {
   const { supabase, user } = await requireUser();
@@ -112,7 +170,6 @@ export async function createBudget(formData: FormData) {
   });
 
   if (error) throw new Error(error.message);
-
   revalidatePath("/");
   revalidatePath("/budgets");
 }
@@ -131,7 +188,6 @@ export async function updateBudget(formData: FormData) {
     .eq("user_id", user.id);
 
   if (error) throw new Error(error.message);
-
   revalidatePath("/");
   revalidatePath("/budgets");
 }
@@ -146,7 +202,6 @@ export async function deleteBudget(formData: FormData) {
     .eq("user_id", user.id);
 
   if (error) throw new Error(error.message);
-
   revalidatePath("/");
   revalidatePath("/budgets");
 }
@@ -162,7 +217,6 @@ export async function createCategory(formData: FormData) {
   });
 
   if (error) throw new Error(error.message);
-
   revalidatePath("/");
   revalidatePath("/budgets");
 }
@@ -179,7 +233,6 @@ export async function createExpense(formData: FormData) {
   });
 
   if (error) throw new Error(error.message);
-
   revalidatePath("/");
   revalidatePath("/expenses");
 }
@@ -199,7 +252,6 @@ export async function updateExpense(formData: FormData) {
     .eq("id", requiredString(formData, "expense_id"));
 
   if (error) throw new Error(error.message);
-
   revalidatePath("/");
   revalidatePath("/expenses");
 }
@@ -213,7 +265,6 @@ export async function deleteExpense(formData: FormData) {
     .eq("id", requiredString(formData, "expense_id"));
 
   if (error) throw new Error(error.message);
-
   revalidatePath("/");
   revalidatePath("/expenses");
 }
@@ -234,7 +285,6 @@ export async function createWishlistItem(formData: FormData) {
   });
 
   if (error) throw new Error(error.message);
-
   revalidatePath("/");
   revalidatePath("/wishlist");
 }
@@ -257,7 +307,6 @@ export async function updateWishlistItem(formData: FormData) {
     .eq("id", requiredString(formData, "wishlist_id"));
 
   if (error) throw new Error(error.message);
-
   revalidatePath("/");
   revalidatePath("/wishlist");
 }
@@ -271,7 +320,6 @@ export async function deleteWishlistItem(formData: FormData) {
     .eq("id", requiredString(formData, "wishlist_id"));
 
   if (error) throw new Error(error.message);
-
   revalidatePath("/");
   revalidatePath("/wishlist");
 }

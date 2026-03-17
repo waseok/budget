@@ -14,7 +14,7 @@ export default async function WishlistPage() {
     <main className="app-shell">
       <Sidebar />
       <div className="content-shell">
-        <Topbar email={data.user?.email} />
+        <Topbar name={data.user?.name} />
         {!data.user ? (
           <EmptyState
             title="로그인이 필요합니다."

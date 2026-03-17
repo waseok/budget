@@ -25,7 +25,7 @@ export default async function HomePage() {
     <main className="app-shell">
       <Sidebar />
       <div className="content-shell">
-        <Topbar email={data.user?.email} />
+        <Topbar name={data.user?.name} />
 
         <section className="hero-panel">
           <div className="hero-copy">
