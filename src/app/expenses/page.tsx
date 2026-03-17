@@ -21,7 +21,7 @@ export default async function ExpensesPage() {
           />
         ) : (
           <>
-            <ExpenseForm categories={categories.map((category) => ({ id: category.id, name: category.name }))} />
+            <ExpenseForm budgets={data.budgets.map((b) => ({ id: b.id, name: b.name, categories: b.categories.map((c) => ({ id: c.id, name: c.name })) }))} />
             <ExpenseManager
               expenses={data.expenses}
               categories={categories.map((category) => ({ id: category.id, name: category.name }))}
