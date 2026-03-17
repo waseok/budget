@@ -349,6 +349,80 @@ textarea { resize: vertical; }
 .security-question-box { padding: 14px 16px; border-radius: 10px; background: var(--surface-soft); border: 1px solid var(--line); display: grid; gap: 6px; }
 .security-question-text { margin: 0; font-weight: 600; }
 
+/* Balance info (지출 추가 폼) */
+.balance-info {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+}
+.balance-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.balance-info span { font-size: 0.88rem; color: var(--muted); }
+.balance-info strong { font-size: 0.95rem; }
+.balance-meta {
+  display: flex;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+/* Budget category expense list (예산 탭) */
+.budget-cat-list { display: grid; gap: 8px; }
+.budget-cat-heading { margin: 0; font-size: 0.82rem; font-weight: 700; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
+.budget-cat-item { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.budget-cat-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 14px;
+  background: var(--surface-soft);
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+}
+.budget-cat-header:hover { background: #e2e8f0; }
+.budget-cat-left { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+.budget-cat-name { font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.budget-cat-count { padding: 2px 8px; border-radius: 999px; background: #e0e7ff; color: #3730a3; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
+.budget-cat-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.budget-cat-toggle { font-size: 0.85rem; color: var(--muted); }
+.budget-cat-expenses { border-top: 1px solid var(--line); }
+.budget-cat-summary {
+  display: flex;
+  gap: 8px;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  background: #fafafa;
+  border-bottom: 1px solid var(--line);
+}
+.budget-cat-empty { margin: 0; padding: 12px 14px; font-size: 0.88rem; color: var(--muted); }
+.budget-cat-expense-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--line);
+}
+.budget-cat-expense-row:first-child { border-top: 0; }
+.budget-cat-expense-info { display: grid; gap: 2px; min-width: 0; }
+.budget-cat-expense-title { font-size: 0.9rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.budget-cat-expense-note { font-size: 0.8rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.budget-cat-expense-right { display: grid; gap: 2px; text-align: right; flex-shrink: 0; }
+.budget-cat-expense-right strong { font-size: 0.9rem; }
+.budget-cat-expense-date { font-size: 0.8rem; color: var(--muted); }
+
 /* Responsive */
 @media (max-width: 1300px) {
   .summary-grid, .quick-forms { grid-template-columns: repeat(2, minmax(0, 1fr)); }

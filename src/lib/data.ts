@@ -16,6 +16,13 @@ export type DashboardData = {
       allocatedAmount: number;
       spentAmount: number;
       color: string;
+      expenses: Array<{
+        id: string;
+        title: string;
+        amount: number;
+        spentOn: string;
+        note: string | null;
+      }>;
     }>;
   }>;
   expenses: Array<{
@@ -51,7 +58,7 @@ export const getDashboardData = cache(async (): Promise<DashboardData> => {
   const { data: budgets } = await supabase
     .from("budgets")
     .select(
-      "id, name, total_amount, period_label, budget_categories(id, name, allocated_amount, color, expenses(amount))",
+      "id, name, total_amount, period_label, budget_categories(id, name, allocated_amount, color, expenses(id, title, amount, spent_on, note))",
     )
     .eq("user_id", user.id)
     .order("created_at", { ascending: true });
@@ -86,13 +93,23 @@ export const getDashboardData = cache(async (): Promise<DashboardData> => {
         totalAmount: Number(budget.total_amount),
         periodLabel: budget.period_label,
         categories:
-          budget.budget_categories?.map((category: { id: string; name: string; allocated_amount: number; color: string; expenses?: { amount: number }[] }) => ({
+          budget.budget_categories?.map((category: { id: string; name: string; allocated_amount: number; color: string; expenses?: { id: string; title: string; amount: number; spent_on: string; note: string | null }[] }) => ({
             id: category.id,
             name: category.name,
             allocatedAmount: Number(category.allocated_amount),
             spentAmount:
               category.expenses?.reduce((sum, expense) => sum + Number(expense.amount), 0) ?? 0,
             color: category.color ?? "#2563eb",
+            expenses:
+              category.expenses
+                ?.map((e) => ({
+                  id: e.id,
+                  title: e.title,
+                  amount: Number(e.amount),
+                  spentOn: e.spent_on,
+                  note: e.note,
+                }))
+                .sort((a, b) => b.spentOn.localeCompare(a.spentOn)) ?? [],
           })) ?? [],
       })) ?? [],
     expenses:

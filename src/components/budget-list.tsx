@@ -3,7 +3,15 @@
 import { useMemo, useState } from "react";
 
 import { deleteBudget, updateBudget } from "@/app/actions";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, formatDate } from "@/lib/format";
+
+type ExpenseDetail = {
+  id: string;
+  title: string;
+  amount: number;
+  spentOn: string;
+  note: string | null;
+};
 
 type BudgetItem = {
   id: string;
@@ -16,6 +24,7 @@ type BudgetItem = {
     allocatedAmount: number;
     spentAmount: number;
     color: string;
+    expenses: ExpenseDetail[];
   }>;
 };
 
@@ -24,6 +33,7 @@ type SortValue = "latest" | "name" | "amount";
 export function BudgetList({ budgets }: { budgets: BudgetItem[] }) {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortValue>("latest");
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
 
   const filteredBudgets = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -43,6 +53,18 @@ export function BudgetList({ budgets }: { budgets: BudgetItem[] }) {
 
     return items;
   }, [budgets, query, sort]);
+
+  const toggleCategory = (categoryId: string) => {
+    setExpandedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(categoryId)) {
+        next.delete(categoryId);
+      } else {
+        next.add(categoryId);
+      }
+      return next;
+    });
+  };
 
   if (budgets.length === 0) return null;
 
@@ -92,7 +114,74 @@ export function BudgetList({ budgets }: { budgets: BudgetItem[] }) {
                   <span>누적 지출</span>
                   <strong>{formatCurrency(spent)}</strong>
                 </div>
+                <div>
+                  <span>잔액</span>
+                  <strong style={{ color: budget.totalAmount - spent < 0 ? "var(--danger)" : "var(--green)" }}>
+                    {formatCurrency(budget.totalAmount - spent)}
+                  </strong>
+                </div>
               </div>
+
+              {budget.categories.length > 0 && (
+                <div className="budget-cat-list">
+                  <p className="budget-cat-heading">세부 항목별 지출</p>
+                  {budget.categories.map((cat) => {
+                    const isExpanded = expandedCategories.has(cat.id);
+                    const remaining = cat.allocatedAmount - cat.spentAmount;
+                    return (
+                      <div key={cat.id} className="budget-cat-item">
+                        <button
+                          type="button"
+                          className="budget-cat-header"
+                          onClick={() => toggleCategory(cat.id)}
+                        >
+                          <div className="budget-cat-left">
+                            <span className="color-dot" style={{ background: cat.color }} />
+                            <span className="budget-cat-name">{cat.name}</span>
+                            {cat.expenses.length > 0 && (
+                              <span className="budget-cat-count">{cat.expenses.length}건</span>
+                            )}
+                          </div>
+                          <div className="budget-cat-right">
+                            <span style={{ color: remaining < 0 ? "var(--danger)" : "var(--green)", fontWeight: 700, fontSize: "0.9rem" }}>
+                              잔액 {formatCurrency(remaining)}
+                            </span>
+                            <span className="budget-cat-toggle">{isExpanded ? "▾" : "▸"}</span>
+                          </div>
+                        </button>
+
+                        {isExpanded && (
+                          <div className="budget-cat-expenses">
+                            <div className="budget-cat-summary">
+                              <span>배정 {formatCurrency(cat.allocatedAmount)}</span>
+                              <span>·</span>
+                              <span>지출 {formatCurrency(cat.spentAmount)}</span>
+                            </div>
+                            {cat.expenses.length === 0 ? (
+                              <p className="budget-cat-empty">지출 내역이 없습니다.</p>
+                            ) : (
+                              cat.expenses.map((expense) => (
+                                <div key={expense.id} className="budget-cat-expense-row">
+                                  <div className="budget-cat-expense-info">
+                                    <span className="budget-cat-expense-title">{expense.title}</span>
+                                    {expense.note && (
+                                      <span className="budget-cat-expense-note">{expense.note}</span>
+                                    )}
+                                  </div>
+                                  <div className="budget-cat-expense-right">
+                                    <strong>{formatCurrency(expense.amount)}</strong>
+                                    <span className="budget-cat-expense-date">{formatDate(expense.spentOn)}</span>
+                                  </div>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
               <form action={updateBudget} className="budget-edit-form">
                 <input type="hidden" name="budget_id" value={budget.id} />
