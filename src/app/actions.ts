@@ -68,27 +68,31 @@ export async function signUp(
   _prevState: { error: string } | null,
   formData: FormData,
 ): Promise<{ error: string }> {
-  const email = requiredString(formData, "email");
-  const password = requiredString(formData, "password");
+  try {
+    const email = requiredString(formData, "email");
+    const password = requiredString(formData, "password");
 
-  // Admin API로 생성 → "Email signups are disabled" 및 이메일 인증 우회
-  const admin = createAdminClient();
-  const { error: createError } = await admin.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-  });
+    // Admin API로 생성 → "Email signups are disabled" 및 이메일 인증 우회
+    const admin = createAdminClient();
+    const { error: createError } = await admin.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true,
+    });
 
-  if (createError) {
-    return { error: createError.message };
-  }
+    if (createError) {
+      return { error: createError.message };
+    }
 
-  // 생성 직후 바로 로그인
-  const supabase = await createClient();
-  const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+    // 생성 직후 바로 로그인
+    const supabase = await createClient();
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
 
-  if (signInError) {
-    return { error: signInError.message };
+    if (signInError) {
+      return { error: signInError.message };
+    }
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "회원가입 중 오류가 발생했습니다." };
   }
 
   revalidatePath("/", "layout");
