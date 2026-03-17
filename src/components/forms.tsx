@@ -9,6 +9,7 @@ import {
   createWishlistItem,
 } from "@/app/actions";
 import { CurrencyInput } from "@/components/currency-input";
+import { PlusIcon, SaveIcon, TrashIcon } from "@/components/icons";
 import { formatCurrency } from "@/lib/format";
 
 type Option = {
@@ -35,8 +36,8 @@ export function BudgetForm() {
         <span>기간</span>
         <input name="period_label" placeholder="예: 2026년 1분기" />
       </label>
-      <button type="submit" className="primary-button">
-        저장
+      <button type="submit" className="primary-button btn-with-icon">
+        <SaveIcon className="btn-icon" />저장
       </button>
     </form>
   );
@@ -75,8 +76,8 @@ export function CategoryForm({ budgets }: { budgets: Option[] }) {
         <span>색상</span>
         <input name="color" type="color" defaultValue="#2563eb" />
       </label>
-      <button type="submit" className="primary-button">
-        추가
+      <button type="submit" className="primary-button btn-with-icon">
+        <PlusIcon className="btn-icon" />추가
       </button>
     </form>
   );
@@ -197,8 +198,8 @@ export function ExpenseForm({ budgets }: { budgets: BudgetWithCategories[] }) {
         <span>메모</span>
         <textarea name="note" rows={3} placeholder="선택 입력" />
       </label>
-      <button type="submit" className="primary-button">
-        추가
+      <button type="submit" className="primary-button btn-with-icon">
+        <PlusIcon className="btn-icon" />추가
       </button>
     </form>
   );
@@ -252,8 +253,12 @@ export function WishlistForm({ categories }: { categories: Option[] }) {
           <option value="low">낮음</option>
         </select>
       </label>
-      <button type="submit" className="primary-button">
-        추가
+      <label>
+        <span>메모</span>
+        <textarea name="memo" rows={3} placeholder="선택 입력" />
+      </label>
+      <button type="submit" className="primary-button btn-with-icon">
+        <PlusIcon className="btn-icon" />추가
       </button>
     </form>
   );
