@@ -419,8 +419,14 @@ textarea { resize: vertical; }
 .budget-cat-edit-actions { display: flex; gap: 8px; }
 .budget-cat-delete-form { padding: 0 14px 14px; display: flex; justify-content: flex-end; }
 
-/* 예산 수정/삭제 묶음 */
+/* 예산 수정/삭제 묶음 — 한 줄 배치 */
 .budget-form-section { display: grid; gap: 10px; }
+.budget-bottom-actions { display: flex; gap: 10px; }
+.budget-bottom-actions > button { flex: 1; }
+
+/* 아이콘 버튼 */
+.btn-with-icon { display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+.btn-icon { width: 16px; height: 16px; flex-shrink: 0; }
 .budget-cat-expenses { border-top: 1px solid var(--line); }
 .budget-cat-summary {
   display: flex;

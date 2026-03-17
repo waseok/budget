@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import { deleteBudget, deleteCategory, updateBudget, updateCategory } from "@/app/actions";
 import { CurrencyInput } from "@/components/currency-input";
+import { SaveIcon, TrashIcon } from "@/components/icons";
 import { formatCurrency, formatDate } from "@/lib/format";
 
 type ExpenseDetail = {
@@ -185,13 +186,17 @@ export function BudgetList({ budgets }: { budgets: BudgetItem[] }) {
                                 <input name="color" type="color" defaultValue={cat.color} />
                               </label>
                               <div className="budget-cat-edit-actions">
-                                <button type="submit" className="primary-button">저장</button>
+                                <button type="submit" className="primary-button btn-with-icon">
+                                  <SaveIcon className="btn-icon" />저장
+                                </button>
                                 <button type="button" className="secondary-button" onClick={() => setEditingCategoryId(null)}>취소</button>
                               </div>
                             </form>
                             <form action={deleteCategory} className="budget-cat-delete-form">
                               <input type="hidden" name="category_id" value={cat.id} />
-                              <button type="submit" className="danger-button">항목 삭제</button>
+                              <button type="submit" className="danger-button btn-with-icon">
+                                <TrashIcon className="btn-icon" />항목 삭제
+                              </button>
                             </form>
                           </div>
                         )}
@@ -230,7 +235,7 @@ export function BudgetList({ budgets }: { budgets: BudgetItem[] }) {
                 </div>
               )}
 
-              {/* 예산 수정 / 삭제 — 하나의 섹션으로 묶어 레이아웃 정렬 */}
+              {/* 예산 수정 / 삭제 */}
               <div className="budget-form-section">
                 <form action={updateBudget} className="budget-edit-form">
                   <input type="hidden" name="budget_id" value={budget.id} />
@@ -246,15 +251,17 @@ export function BudgetList({ budgets }: { budgets: BudgetItem[] }) {
                     <span>기간</span>
                     <input name="period_label" defaultValue={budget.periodLabel ?? ""} />
                   </label>
-                  <button type="submit" className="primary-button">
-                    수정 저장
-                  </button>
-                </form>
-                <form action={deleteBudget} className="delete-form">
-                  <input type="hidden" name="budget_id" value={budget.id} />
-                  <button type="submit" className="danger-button">
-                    예산 삭제
-                  </button>
+                  <div className="budget-bottom-actions">
+                    <button type="submit" className="primary-button btn-with-icon">
+                      <SaveIcon className="btn-icon" />수정 저장
+                    </button>
+                    <form action={deleteBudget} style={{ flex: 1 }}>
+                      <input type="hidden" name="budget_id" value={budget.id} />
+                      <button type="submit" className="danger-button btn-with-icon" style={{ width: "100%" }}>
+                        <TrashIcon className="btn-icon" />예산 삭제
+                      </button>
+                    </form>
+                  </div>
                 </form>
               </div>
             </article>
