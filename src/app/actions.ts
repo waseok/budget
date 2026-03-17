@@ -68,31 +68,33 @@ export async function signUp(
   _prevState: { error: string } | null,
   formData: FormData,
 ): Promise<{ error: string }> {
-  try {
-    const email = requiredString(formData, "email");
-    const password = requiredString(formData, "password");
+  const email = requiredString(formData, "email");
+  const password = requiredString(formData, "password");
+  const supabase = await createClient();
 
-    // Admin API로 생성 → "Email signups are disabled" 및 이메일 인증 우회
-    const admin = createAdminClient();
-    const { error: createError } = await admin.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: true,
-    });
-
-    if (createError) {
-      return { error: createError.message };
+  // service role key가 있으면 Admin API로 (이메일 인증 우회)
+  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    try {
+      const admin = createAdminClient();
+      const { error: createError } = await admin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+      });
+      if (createError) return { error: createError.message };
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : "회원가입 중 오류가 발생했습니다." };
     }
 
-    // 생성 직후 바로 로그인
-    const supabase = await createClient();
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-
-    if (signInError) {
-      return { error: signInError.message };
+    if (signInError) return { error: signInError.message };
+  } else {
+    // 표준 signup (Supabase 대시보드에서 이메일 가입 허용 필요)
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) return { error: error.message };
+    if (!data.session) {
+      return { error: "가입 완료! 이메일을 확인해 인증 링크를 클릭해주세요." };
     }
-  } catch (e) {
-    return { error: e instanceof Error ? e.message : "회원가입 중 오류가 발생했습니다." };
   }
 
   revalidatePath("/", "layout");
