@@ -103,13 +103,13 @@ button, input, select, textarea { font: inherit; }
 .hero-copy { display: grid; gap: 18px; padding: 32px; }
 .hero-copy h1 {
   margin: 0;
-  max-width: 13ch;
-  font-size: clamp(2.2rem, 4vw, 3.6rem);
-  line-height: 1.02;
-  letter-spacing: -0.04em;
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  word-break: keep-all;
 }
 
-.hero-subtle, .muted { color: var(--muted); }
+.hero-subtle, .muted { color: var(--muted); word-break: keep-all; }
 
 .eyebrow {
   margin: 0;
