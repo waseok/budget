@@ -76,15 +76,32 @@ textarea {
 }
 
 .nav-link {
-  display: block;
-  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
   border-radius: 12px;
   color: var(--muted);
+  font-weight: 500;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
 }
 
-.nav-link:hover {
+.nav-link:hover,
+.nav-link.active {
   background: var(--surface-soft);
   color: var(--text);
+}
+
+.nav-link.active {
+  font-weight: 700;
+}
+
+.nav-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
 }
 
 .content-shell {
@@ -203,15 +220,16 @@ textarea {
 .summary-icon {
   display: grid;
   place-items: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
   background: var(--surface-soft);
+  flex-shrink: 0;
 }
 
 .card-icon {
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 28px;
 }
 
 .tone-blue .summary-icon {
@@ -234,6 +252,26 @@ textarea {
 .panel h2,
 .budget-item h3 {
   margin: 0;
+}
+
+.summary-card h3 {
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.summary-card .muted {
+  font-size: 0.82rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.summary-head .eyebrow {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .section-stack,

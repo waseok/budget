@@ -45,6 +45,49 @@ export async function signOut() {
   redirect("/login");
 }
 
+export async function signIn(
+  _prevState: { error: string } | null,
+  formData: FormData,
+): Promise<{ error: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signInWithPassword({
+    email: requiredString(formData, "email"),
+    password: requiredString(formData, "password"),
+  });
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/");
+}
+
+export async function signUp(
+  _prevState: { error: string; message: string } | null,
+  formData: FormData,
+): Promise<{ error: string; message: string }> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signUp({
+    email: requiredString(formData, "email"),
+    password: requiredString(formData, "password"),
+    options: {
+      data: { full_name: optionalString(formData, "name") },
+    },
+  });
+
+  if (error) {
+    return { error: error.message, message: "" };
+  }
+
+  if (data.session) {
+    revalidatePath("/", "layout");
+    redirect("/");
+  }
+
+  return { error: "", message: "인증 메일을 발송했습니다. 받은 편지함을 확인해주세요." };
+}
+
 export async function createBudget(formData: FormData) {
   const { supabase, user } = await requireUser();
 

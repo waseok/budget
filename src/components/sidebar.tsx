@@ -1,12 +1,21 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+import { HomeIcon, PersonIcon, ReceiptIcon, WalletIcon, WishIcon } from "@/components/icons";
+
 const navItems = [
-  { label: "대시보드", href: "/" },
-  { label: "예산", href: "/budgets" },
-  { label: "지출", href: "/expenses" },
-  { label: "위시리스트", href: "/wishlist" },
-  { label: "로그인", href: "/login" },
+  { label: "대시보드", href: "/", icon: HomeIcon },
+  { label: "예산", href: "/budgets", icon: WalletIcon },
+  { label: "지출", href: "/expenses", icon: ReceiptIcon },
+  { label: "위시리스트", href: "/wishlist", icon: WishIcon },
+  { label: "로그인", href: "/login", icon: PersonIcon },
 ];
 
 export function Sidebar() {
+  const pathname = usePathname();
+
   return (
     <aside className="sidebar">
       <div>
@@ -15,13 +24,18 @@ export function Sidebar() {
       </div>
       <nav>
         <ul className="nav-list">
-          {navItems.map((item) => (
-            <li key={item.href}>
-              <a href={item.href} className="nav-link">
-                {item.label}
-              </a>
-            </li>
-          ))}
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.href;
+            return (
+              <li key={item.href}>
+                <Link href={item.href} className={`nav-link${isActive ? " active" : ""}`}>
+                  <Icon className="nav-icon" />
+                  <span>{item.label}</span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </nav>
     </aside>
