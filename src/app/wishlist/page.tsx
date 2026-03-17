@@ -12,7 +12,7 @@ export default async function WishlistPage() {
 
   return (
     <main className="app-shell">
-      <Sidebar />
+      <Sidebar user={data.user?.name} />
       <div className="content-shell">
         <Topbar name={data.user?.name} />
         {!data.user ? (

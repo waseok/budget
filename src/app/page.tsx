@@ -23,13 +23,12 @@ export default async function HomePage() {
 
   return (
     <main className="app-shell">
-      <Sidebar />
+      <Sidebar user={data.user?.name} />
       <div className="content-shell">
         <Topbar name={data.user?.name} />
 
         <section className="hero-panel">
           <div className="hero-copy">
-            <p className="eyebrow">Budget Companion Dashboard</p>
             <h1>예산 흐름을 한 화면에서 보고, 바로 기록하고, 바로 정리하세요.</h1>
             <p className="hero-subtle">
               예산, 예산 항목, 지출, 위시리스트를 따로 헤매지 않도록 첫 화면을 작업 허브처럼
@@ -46,7 +45,6 @@ export default async function HomePage() {
           </div>
 
           <div className="hero-spotlight clean-card">
-            <p className="eyebrow">이번 화면의 포인트</p>
             <div className="hero-spotlight-value">{usageRate}%</div>
             <p className="muted">
               전체 예산 대비 현재 사용률입니다. 위시리스트를 연결하려면 예산만이 아니라 예산

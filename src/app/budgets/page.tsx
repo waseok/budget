@@ -10,7 +10,7 @@ export default async function BudgetsPage() {
 
   return (
     <main className="app-shell">
-      <Sidebar />
+      <Sidebar user={data.user?.name} />
       <div className="content-shell">
         <Topbar name={data.user?.name} />
         {!data.user ? (

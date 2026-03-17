@@ -41,7 +41,8 @@ export function CategoryForm({ budgets }: { budgets: Option[] }) {
     <form action={createCategory} className="form-card clean-card">
       <div className="form-heading">
         <p className="eyebrow">예산 항목</p>
-        <h2>항목 추가</h2>
+        <h2>세부 항목 추가</h2>
+        <p className="field-help">항목명 없이 금액만 입력해도 됩니다. 예산을 세부 항목 없이 통으로 관리할 때 사용하세요.</p>
       </div>
       <label>
         <span>예산</span>
@@ -57,8 +58,8 @@ export function CategoryForm({ budgets }: { budgets: Option[] }) {
         </select>
       </label>
       <label>
-        <span>항목 이름</span>
-        <input name="name" placeholder="예: 교통비" required />
+        <span>항목 이름 <span style={{ fontWeight: 400, color: "var(--muted)" }}>(선택)</span></span>
+        <input name="name" placeholder="예: 교통비 — 비워도 됩니다" />
       </label>
       <label>
         <span>배정 금액</span>

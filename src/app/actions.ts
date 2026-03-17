@@ -211,7 +211,7 @@ export async function createCategory(formData: FormData) {
 
   const { error } = await supabase.from("budget_categories").insert({
     budget_id: requiredString(formData, "budget_id"),
-    name: requiredString(formData, "name"),
+    name: optionalString(formData, "name") ?? "미분류",
     allocated_amount: requiredNumber(formData, "allocated_amount"),
     color: optionalString(formData, "color") ?? "#2563eb",
   });
