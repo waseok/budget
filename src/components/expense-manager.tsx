@@ -1,4 +1,7 @@
+"use client";
+
 import { deleteExpense, updateExpense } from "@/app/actions";
+import { CurrencyInput } from "@/components/currency-input";
 import { formatCurrency, formatDate } from "@/lib/format";
 
 type ExpenseItem = {
@@ -60,7 +63,7 @@ export function ExpenseManager({
               </label>
               <label>
                 <span>금액</span>
-                <input name="amount" type="number" min="1" step="1" defaultValue={expense.amount} required />
+                <CurrencyInput name="amount" defaultValue={expense.amount} required />
               </label>
               <label>
                 <span>지출일</span>

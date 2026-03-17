@@ -377,25 +377,50 @@ textarea { resize: vertical; }
 .budget-cat-list { display: grid; gap: 8px; }
 .budget-cat-heading { margin: 0; font-size: 0.82rem; font-weight: 700; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
 .budget-cat-item { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.budget-cat-header-wrap { display: flex; align-items: stretch; background: var(--surface-soft); }
 .budget-cat-header {
-  width: 100%;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   padding: 11px 14px;
-  background: var(--surface-soft);
+  background: transparent;
   border: 0;
   cursor: pointer;
   text-align: left;
   transition: background 0.12s;
+  min-width: 0;
 }
 .budget-cat-header:hover { background: #e2e8f0; }
+.budget-cat-edit-btn {
+  flex-shrink: 0;
+  width: 38px;
+  border: 0;
+  border-left: 1px solid var(--line);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.12s, color 0.12s;
+}
+.budget-cat-edit-btn:hover { background: #e0e7ff; color: var(--blue); }
 .budget-cat-left { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
 .budget-cat-name { font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .budget-cat-count { padding: 2px 8px; border-radius: 999px; background: #e0e7ff; color: #3730a3; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
 .budget-cat-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .budget-cat-toggle { font-size: 0.85rem; color: var(--muted); }
+
+/* 항목 수정 폼 */
+.budget-cat-edit-wrap { border-top: 1px solid var(--line); display: grid; gap: 0; }
+.budget-cat-edit-form { display: grid; gap: 10px; padding: 14px; }
+.budget-cat-edit-form label { display: grid; gap: 6px; }
+.budget-cat-edit-form span { font-size: 0.88rem; font-weight: 600; }
+.budget-cat-edit-actions { display: flex; gap: 8px; }
+.budget-cat-delete-form { padding: 0 14px 14px; display: flex; justify-content: flex-end; }
+
+/* 예산 수정/삭제 묶음 */
+.budget-form-section { display: grid; gap: 10px; }
 .budget-cat-expenses { border-top: 1px solid var(--line); }
 .budget-cat-summary {
   display: flex;

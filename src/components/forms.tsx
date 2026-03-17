@@ -8,6 +8,7 @@ import {
   createExpense,
   createWishlistItem,
 } from "@/app/actions";
+import { CurrencyInput } from "@/components/currency-input";
 import { formatCurrency } from "@/lib/format";
 
 type Option = {
@@ -28,7 +29,7 @@ export function BudgetForm() {
       </label>
       <label>
         <span>총 예산</span>
-        <input name="total_amount" type="number" min="0" step="1000" placeholder="1500000" required />
+        <CurrencyInput name="total_amount" placeholder="1,500,000" required />
       </label>
       <label>
         <span>기간</span>
@@ -68,7 +69,7 @@ export function CategoryForm({ budgets }: { budgets: Option[] }) {
       </label>
       <label>
         <span>배정 금액</span>
-        <input name="allocated_amount" type="number" min="0" step="1000" placeholder="300000" required />
+        <CurrencyInput name="allocated_amount" placeholder="300,000" required />
       </label>
       <label>
         <span>색상</span>
@@ -186,7 +187,7 @@ export function ExpenseForm({ budgets }: { budgets: BudgetWithCategories[] }) {
       </label>
       <label>
         <span>금액</span>
-        <input name="amount" type="number" min="1" step="1" placeholder="65800" required />
+        <CurrencyInput name="amount" placeholder="65,800" required />
       </label>
       <label>
         <span>지출일</span>
@@ -224,7 +225,7 @@ export function WishlistForm({ categories }: { categories: Option[] }) {
       </label>
       <label>
         <span>예상 가격</span>
-        <input name="expected_price" type="number" min="0" step="1000" placeholder="89000" />
+        <CurrencyInput name="expected_price" placeholder="89,000" />
       </label>
       <label>
         <span>연결 예산 항목</span>
