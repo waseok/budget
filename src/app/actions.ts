@@ -222,6 +222,36 @@ export async function createCategory(formData: FormData) {
   revalidatePath("/budgets");
 }
 
+export async function updateCategory(formData: FormData) {
+  const { supabase } = await requireUser();
+
+  const { error } = await supabase
+    .from("budget_categories")
+    .update({
+      name: optionalString(formData, "name") ?? "미분류",
+      allocated_amount: requiredNumber(formData, "allocated_amount"),
+      color: optionalString(formData, "color") ?? "#2563eb",
+    })
+    .eq("id", requiredString(formData, "category_id"));
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/");
+  revalidatePath("/budgets");
+}
+
+export async function deleteCategory(formData: FormData) {
+  const { supabase } = await requireUser();
+
+  const { error } = await supabase
+    .from("budget_categories")
+    .delete()
+    .eq("id", requiredString(formData, "category_id"));
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/");
+  revalidatePath("/budgets");
+}
+
 export async function createExpense(formData: FormData) {
   const { supabase } = await requireUser();
 

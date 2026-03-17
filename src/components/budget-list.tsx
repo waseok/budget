@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 
-import { deleteBudget, updateBudget } from "@/app/actions";
+import { deleteBudget, deleteCategory, updateBudget, updateCategory } from "@/app/actions";
+import { CurrencyInput } from "@/components/currency-input";
 import { formatCurrency, formatDate } from "@/lib/format";
 
 type ExpenseDetail = {
@@ -34,6 +35,7 @@ export function BudgetList({ budgets }: { budgets: BudgetItem[] }) {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortValue>("latest");
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
 
   const filteredBudgets = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -55,13 +57,11 @@ export function BudgetList({ budgets }: { budgets: BudgetItem[] }) {
   }, [budgets, query, sort]);
 
   const toggleCategory = (categoryId: string) => {
+    if (editingCategoryId === categoryId) return;
     setExpandedCategories((prev) => {
       const next = new Set(prev);
-      if (next.has(categoryId)) {
-        next.delete(categoryId);
-      } else {
-        next.add(categoryId);
-      }
+      if (next.has(categoryId)) next.delete(categoryId);
+      else next.add(categoryId);
       return next;
     });
   };
@@ -94,6 +94,7 @@ export function BudgetList({ budgets }: { budgets: BudgetItem[] }) {
         {filteredBudgets.map((budget) => {
           const spent = budget.categories.reduce((sum, item) => sum + item.spentAmount, 0);
           const usage = budget.totalAmount > 0 ? Math.round((spent / budget.totalAmount) * 100) : 0;
+          const remaining = budget.totalAmount - spent;
 
           return (
             <article key={budget.id} className="budget-item">
@@ -116,41 +117,87 @@ export function BudgetList({ budgets }: { budgets: BudgetItem[] }) {
                 </div>
                 <div>
                   <span>잔액</span>
-                  <strong style={{ color: budget.totalAmount - spent < 0 ? "var(--danger)" : "var(--green)" }}>
-                    {formatCurrency(budget.totalAmount - spent)}
+                  <strong style={{ color: remaining < 0 ? "var(--danger)" : "var(--green)" }}>
+                    {formatCurrency(remaining)}
                   </strong>
                 </div>
               </div>
 
+              {/* 세부 항목별 지출 */}
               {budget.categories.length > 0 && (
                 <div className="budget-cat-list">
                   <p className="budget-cat-heading">세부 항목별 지출</p>
                   {budget.categories.map((cat) => {
                     const isExpanded = expandedCategories.has(cat.id);
-                    const remaining = cat.allocatedAmount - cat.spentAmount;
+                    const isEditing = editingCategoryId === cat.id;
+                    const catRemaining = cat.allocatedAmount - cat.spentAmount;
+
                     return (
                       <div key={cat.id} className="budget-cat-item">
-                        <button
-                          type="button"
-                          className="budget-cat-header"
-                          onClick={() => toggleCategory(cat.id)}
-                        >
-                          <div className="budget-cat-left">
-                            <span className="color-dot" style={{ background: cat.color }} />
-                            <span className="budget-cat-name">{cat.name}</span>
-                            {cat.expenses.length > 0 && (
-                              <span className="budget-cat-count">{cat.expenses.length}건</span>
-                            )}
-                          </div>
-                          <div className="budget-cat-right">
-                            <span style={{ color: remaining < 0 ? "var(--danger)" : "var(--green)", fontWeight: 700, fontSize: "0.9rem" }}>
-                              잔액 {formatCurrency(remaining)}
-                            </span>
-                            <span className="budget-cat-toggle">{isExpanded ? "▾" : "▸"}</span>
-                          </div>
-                        </button>
+                        <div className="budget-cat-header-wrap">
+                          <button
+                            type="button"
+                            className="budget-cat-header"
+                            onClick={() => toggleCategory(cat.id)}
+                          >
+                            <div className="budget-cat-left">
+                              <span className="color-dot" style={{ background: cat.color }} />
+                              <span className="budget-cat-name">{cat.name}</span>
+                              {cat.expenses.length > 0 && (
+                                <span className="budget-cat-count">{cat.expenses.length}건</span>
+                              )}
+                            </div>
+                            <div className="budget-cat-right">
+                              <span style={{ color: catRemaining < 0 ? "var(--danger)" : "var(--green)", fontWeight: 700, fontSize: "0.9rem" }}>
+                                잔액 {formatCurrency(catRemaining)}
+                              </span>
+                              <span className="budget-cat-toggle">{isExpanded ? "▾" : "▸"}</span>
+                            </div>
+                          </button>
+                          <button
+                            type="button"
+                            className="budget-cat-edit-btn"
+                            onClick={() => setEditingCategoryId(isEditing ? null : cat.id)}
+                            title="항목 수정"
+                          >
+                            ✎
+                          </button>
+                        </div>
 
-                        {isExpanded && (
+                        {/* 항목 수정 폼 */}
+                        {isEditing && (
+                          <div className="budget-cat-edit-wrap">
+                            <form
+                              action={async (fd) => { await updateCategory(fd); setEditingCategoryId(null); }}
+                              className="budget-cat-edit-form"
+                            >
+                              <input type="hidden" name="category_id" value={cat.id} />
+                              <label>
+                                <span>항목 이름</span>
+                                <input name="name" defaultValue={cat.name} />
+                              </label>
+                              <label>
+                                <span>배정 금액</span>
+                                <CurrencyInput name="allocated_amount" defaultValue={cat.allocatedAmount} required />
+                              </label>
+                              <label>
+                                <span>색상</span>
+                                <input name="color" type="color" defaultValue={cat.color} />
+                              </label>
+                              <div className="budget-cat-edit-actions">
+                                <button type="submit" className="primary-button">저장</button>
+                                <button type="button" className="secondary-button" onClick={() => setEditingCategoryId(null)}>취소</button>
+                              </div>
+                            </form>
+                            <form action={deleteCategory} className="budget-cat-delete-form">
+                              <input type="hidden" name="category_id" value={cat.id} />
+                              <button type="submit" className="danger-button">항목 삭제</button>
+                            </form>
+                          </div>
+                        )}
+
+                        {/* 지출 내역 */}
+                        {isExpanded && !isEditing && (
                           <div className="budget-cat-expenses">
                             <div className="budget-cat-summary">
                               <span>배정 {formatCurrency(cat.allocatedAmount)}</span>
@@ -183,40 +230,33 @@ export function BudgetList({ budgets }: { budgets: BudgetItem[] }) {
                 </div>
               )}
 
-              <form action={updateBudget} className="budget-edit-form">
-                <input type="hidden" name="budget_id" value={budget.id} />
-                <label>
-                  <span>예산 이름</span>
-                  <input name="name" defaultValue={budget.name} required />
-                </label>
-                <label>
-                  <span>총 예산</span>
-                  <input
-                    name="total_amount"
-                    type="number"
-                    min="0"
-                    step="1000"
-                    defaultValue={budget.totalAmount}
-                    required
-                  />
-                </label>
-                <label>
-                  <span>기간</span>
-                  <input name="period_label" defaultValue={budget.periodLabel ?? ""} />
-                </label>
-                <div className="budget-actions">
+              {/* 예산 수정 / 삭제 — 하나의 섹션으로 묶어 레이아웃 정렬 */}
+              <div className="budget-form-section">
+                <form action={updateBudget} className="budget-edit-form">
+                  <input type="hidden" name="budget_id" value={budget.id} />
+                  <label>
+                    <span>예산 이름</span>
+                    <input name="name" defaultValue={budget.name} required />
+                  </label>
+                  <label>
+                    <span>총 예산</span>
+                    <CurrencyInput name="total_amount" defaultValue={budget.totalAmount} required />
+                  </label>
+                  <label>
+                    <span>기간</span>
+                    <input name="period_label" defaultValue={budget.periodLabel ?? ""} />
+                  </label>
                   <button type="submit" className="primary-button">
                     수정 저장
                   </button>
-                </div>
-              </form>
-
-              <form action={deleteBudget} className="delete-form">
-                <input type="hidden" name="budget_id" value={budget.id} />
-                <button type="submit" className="danger-button">
-                  예산 삭제
-                </button>
-              </form>
+                </form>
+                <form action={deleteBudget} className="delete-form">
+                  <input type="hidden" name="budget_id" value={budget.id} />
+                  <button type="submit" className="danger-button">
+                    예산 삭제
+                  </button>
+                </form>
+              </div>
             </article>
           );
         })}
