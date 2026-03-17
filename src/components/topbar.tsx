@@ -4,7 +4,7 @@ export function Topbar({ email }: { email?: string | null }) {
   return (
     <header className="topbar">
       <div>
-        <p className="topbar-label">{email ? email : "로그인 전"}</p>
+        <p className="topbar-label">{email ? email : "로그인이 필요합니다"}</p>
       </div>
       {email ? (
         <form action={signOut}>

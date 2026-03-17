@@ -50,8 +50,8 @@ export function BudgetList({ budgets }: { budgets: BudgetItem[] }) {
     <section className="section-stack">
       <div className="section-heading">
         <div>
-          <p className="eyebrow">예산 관리</p>
-          <h2>예산 추가, 수정, 삭제</h2>
+          <p className="eyebrow">Budget Manager</p>
+          <h2>예산을 검색하고 바로 수정하세요</h2>
         </div>
       </div>
 
@@ -59,7 +59,7 @@ export function BudgetList({ budgets }: { budgets: BudgetItem[] }) {
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="예산 이름 또는 기간 검색"
+          placeholder="예산 이름 또는 기간으로 검색"
         />
         <select value={sort} onChange={(event) => setSort(event.target.value as SortValue)}>
           <option value="latest">기본 순서</option>

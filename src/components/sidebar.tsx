@@ -18,9 +18,10 @@ export function Sidebar() {
 
   return (
     <aside className="sidebar">
-      <div>
+      <div className="sidebar-brand">
         <p className="eyebrow">Budget Board</p>
-        <h2 className="sidebar-title">예산 관리</h2>
+        <h2 className="sidebar-title">예산 관리 보드</h2>
+        <p className="muted sidebar-copy">예산과 소비 흐름을 차분하게 정리하는 개인 대시보드</p>
       </div>
       <nav>
         <ul className="nav-list">
