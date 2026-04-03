@@ -1,3 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .font-headline {
+    font-family: "Manrope", sans-serif;
+  }
+}
+
 :root {
   --bg: #f8fafc;
   --surface: #ffffff;
@@ -23,7 +33,7 @@ body {
   min-height: 100vh;
   background: var(--bg);
   color: var(--text);
-  font-family: "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  font-family: "Inter", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
   font-size: 15px;
   line-height: 1.5;
 }

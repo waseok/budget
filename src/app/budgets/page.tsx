@@ -9,10 +9,11 @@ export default async function BudgetsPage() {
   const data = await getDashboardData();
 
   return (
-    <main className="app-shell">
+    <main className="flex min-h-screen bg-slate-50">
       <Sidebar user={data.user?.name} />
-      <div className="content-shell">
+      <div className="flex-1 flex flex-col ml-72">
         <Topbar name={data.user?.name} />
+        <div className="flex-1 p-8">
         {!data.user ? (
           <EmptyState
             title="로그인이 필요합니다."
@@ -41,6 +42,7 @@ export default async function BudgetsPage() {
             <BudgetList budgets={data.budgets} />
           </>
         )}
+        </div>
       </div>
     </main>
   );
