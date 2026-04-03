@@ -1,5 +1,5 @@
 import { BudgetList } from "@/components/budget-list";
-import { CategoryForm } from "@/components/forms";
+import { BudgetForm, CategoryForm } from "@/components/forms";
 import { EmptyState } from "@/components/empty-state";
 import { Sidebar } from "@/components/sidebar";
 import { Topbar } from "@/components/topbar";
@@ -20,6 +20,15 @@ export default async function BudgetsPage() {
           />
         ) : (
           <>
+            <section className="section-stack">
+              <div className="section-heading">
+                <div>
+                  <p className="eyebrow">새 예산</p>
+                  <h2>예산 추가</h2>
+                </div>
+              </div>
+              <BudgetForm />
+            </section>
             <section className="section-stack">
               <div className="section-heading">
                 <div>
