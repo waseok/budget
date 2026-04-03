@@ -176,7 +176,7 @@ button, input, select, textarea { font: inherit; }
 .two-column-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .budget-usage-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .quick-forms { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.budget-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.budget-list { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
 .manager-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
 /* Cards */
