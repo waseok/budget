@@ -20,10 +20,11 @@ export default async function HomePage() {
   const usageDisplay = rawUsage === 0 ? "0" : rawUsage < 1 ? "< 1" : Math.round(rawUsage).toString();
 
   return (
-    <main className="app-shell">
+    <main className="flex min-h-screen bg-slate-50">
       <Sidebar user={data.user?.name} />
-      <div className="content-shell">
+      <div className="flex-1 flex flex-col ml-72">
         <Topbar name={data.user?.name} />
+        <div className="flex-1 p-8 content-shell">
 
         <section className="hero-panel">
           <div className="hero-copy">
@@ -109,6 +110,7 @@ export default async function HomePage() {
             description="회원가입 또는 로그인 후 예산, 지출, 위시리스트까지 한 번에 관리할 수 있습니다."
           />
         )}
+        </div>
       </div>
     </main>
   );

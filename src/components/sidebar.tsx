@@ -4,34 +4,51 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { signOut } from "@/app/actions";
-import { HomeIcon, PersonIcon, ReceiptIcon, WalletIcon, WishIcon } from "@/components/icons";
 
 const navItems = [
-  { label: "대시보드", href: "/", icon: HomeIcon },
-  { label: "예산", href: "/budgets", icon: WalletIcon },
-  { label: "지출", href: "/expenses", icon: ReceiptIcon },
-  { label: "위시리스트", href: "/wishlist", icon: WishIcon },
+  { label: "대시보드", href: "/", icon: "dashboard" },
+  { label: "예산", href: "/budgets", icon: "account_balance_wallet" },
+  { label: "지출", href: "/expenses", icon: "receipt_long" },
+  { label: "위시리스트", href: "/wishlist", icon: "favorite" },
 ];
 
 export function Sidebar({ user }: { user?: string | null }) {
   const pathname = usePathname();
 
   return (
-    <aside className="sidebar">
-      <div className="sidebar-brand">
-        <p className="eyebrow">Budget Board</p>
-        <h2 className="sidebar-title">예산 관리 보드</h2>
-        <p className="muted sidebar-copy">예산과 소비 흐름을 차분하게 정리하는 개인 대시보드</p>
+    <aside className="fixed left-0 top-0 h-screen w-72 bg-white border-r border-slate-100 flex flex-col z-40">
+      {/* Brand */}
+      <div className="px-6 pt-8 pb-6">
+        <p className="text-xs font-medium text-slate-400 uppercase tracking-widest mb-1">Premium Wealth Management</p>
+        <h2
+          className="font-headline text-xl font-bold leading-tight"
+          style={{ background: "linear-gradient(135deg, #1d4ed8, #3b82f6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}
+        >
+          Financial Atelier
+        </h2>
       </div>
-      <nav>
-        <ul className="nav-list">
+
+      {/* Nav */}
+      <nav className="flex-1 px-3 overflow-y-auto">
+        <ul className="space-y-1">
           {navItems.map((item) => {
-            const Icon = item.icon;
             const isActive = pathname === item.href;
             return (
               <li key={item.href}>
-                <Link href={item.href} className={`nav-link${isActive ? " active" : ""}`}>
-                  <Icon className="nav-icon" />
+                <Link
+                  href={item.href}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-headline font-medium text-sm transition-all duration-150 ${
+                    isActive
+                      ? "bg-blue-50/80 text-blue-700"
+                      : "text-slate-500 hover:text-blue-600 hover:bg-slate-50"
+                  }`}
+                >
+                  <span
+                    className="material-symbols-outlined text-xl leading-none"
+                    style={{ fontVariationSettings: "'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20" }}
+                  >
+                    {item.icon}
+                  </span>
                   <span>{item.label}</span>
                 </Link>
               </li>
@@ -39,15 +56,40 @@ export function Sidebar({ user }: { user?: string | null }) {
           })}
         </ul>
       </nav>
-      <div className="sidebar-auth">
+
+      {/* Bottom user area */}
+      <div className="px-3 pb-6 pt-4">
         {user ? (
-          <form action={signOut}>
-            <p className="sidebar-username">{user}님</p>
-            <button type="submit" className="secondary-button sidebar-logout">로그아웃</button>
-          </form>
+          <div className="bg-slate-50/50 rounded-3xl p-4">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-headline font-semibold text-sm flex-shrink-0">
+                {user.charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-slate-800 truncate">{user}님</p>
+                <p className="text-xs text-slate-400">회원</p>
+              </div>
+            </div>
+            <form action={signOut}>
+              <button
+                type="submit"
+                className="w-full text-xs font-medium text-slate-500 hover:text-slate-700 bg-white/80 hover:bg-white rounded-xl py-2 px-3 transition-colors border border-slate-100"
+              >
+                로그아웃
+              </button>
+            </form>
+          </div>
         ) : (
-          <Link href="/login" className="nav-link">
-            <PersonIcon className="nav-icon" />
+          <Link
+            href="/login"
+            className="flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-500 hover:text-blue-600 hover:bg-slate-50 font-headline font-medium text-sm transition-all duration-150"
+          >
+            <span
+              className="material-symbols-outlined text-xl leading-none"
+              style={{ fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20" }}
+            >
+              login
+            </span>
             <span>로그인</span>
           </Link>
         )}
@@ -55,4 +97,3 @@ export function Sidebar({ user }: { user?: string | null }) {
     </aside>
   );
 }
-
