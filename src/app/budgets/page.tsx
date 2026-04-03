@@ -13,7 +13,7 @@ export default async function BudgetsPage() {
       <Sidebar user={data.user?.name} />
       <div className="flex-1 flex flex-col ml-72">
         <Topbar name={data.user?.name} />
-        <div className="flex-1 p-8 content-shell">
+        <div className="flex-1 p-8">
         {!data.user ? (
           <EmptyState
             title="로그인이 필요합니다."

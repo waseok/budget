@@ -20,27 +20,6 @@ export function Topbar({ name }: { name?: string | null }) {
 
       {/* Right side */}
       <div className="flex items-center gap-3">
-        {/* Notifications */}
-        <button className="relative w-9 h-9 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 transition-colors">
-          <span
-            className="material-symbols-outlined text-xl"
-            style={{ fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20" }}
-          >
-            notifications
-          </span>
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500" />
-        </button>
-
-        {/* Settings */}
-        <button className="w-9 h-9 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 transition-colors">
-          <span
-            className="material-symbols-outlined text-xl"
-            style={{ fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20" }}
-          >
-            settings
-          </span>
-        </button>
-
         {/* Divider */}
         <div className="w-px h-6 bg-slate-200" />
 

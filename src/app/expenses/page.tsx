@@ -10,9 +10,9 @@ export default async function ExpensesPage() {
   const categories = data.budgets.flatMap((budget) => budget.categories);
 
   return (
-    <main className="app-shell">
+    <main className="flex min-h-screen bg-slate-50">
       <Sidebar user={data.user?.name} />
-      <div className="content-shell">
+      <div className="flex-1 flex flex-col ml-72">
         <Topbar name={data.user?.name} />
         {!data.user ? (
           <EmptyState
