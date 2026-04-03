@@ -163,8 +163,8 @@ button, input, select, textarea { font: inherit; }
 .budget-usage-grid,
 .two-column-grid,
 .quick-forms,
-.budget-list,
 .manager-list { display: grid; gap: 12px; }
+.budget-list { columns: 2; column-gap: 12px; }
 
 .hero-stat-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .hero-stat-card { display: grid; gap: 8px; padding: 18px; }
@@ -176,7 +176,7 @@ button, input, select, textarea { font: inherit; }
 .two-column-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .budget-usage-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .quick-forms { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.budget-list { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+.budget-list .budget-item { break-inside: avoid; margin-bottom: 12px; }
 .manager-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
 /* Cards */
@@ -471,9 +471,10 @@ textarea { resize: vertical; }
 
 @media (max-width: 1100px) {
   .app-shell, .hero-panel, .hero-stat-strip, .summary-grid, .budget-usage-grid,
-  .focus-grid, .two-column-grid, .quick-forms, .budget-list, .manager-list, .wishlist-grid {
+  .focus-grid, .two-column-grid, .quick-forms, .manager-list, .wishlist-grid {
     grid-template-columns: 1fr;
   }
+  .budget-list { columns: 1; }
   .sidebar { position: static; }
 }
 
