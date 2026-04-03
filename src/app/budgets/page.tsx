@@ -42,6 +42,7 @@ export default async function BudgetsPage() {
             <BudgetList budgets={data.budgets} />
           </>
         )}
+        </div>
       </div>
     </main>
   );
