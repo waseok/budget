@@ -1,4 +1,5 @@
 import { deleteWishlistItem, updateWishlistItem } from "@/app/actions";
+import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { formatCurrency } from "@/lib/format";
 
 type WishlistItem = {
@@ -98,9 +99,12 @@ export function WishlistManager({
             </form>
             <form action={deleteWishlistItem} className="delete-form">
               <input type="hidden" name="wishlist_id" value={item.id} />
-              <button type="submit" className="danger-button">
+              <ConfirmDeleteButton
+                className="danger-button"
+                message={`"${item.title}" 항목을 삭제하시겠습니까?`}
+              >
                 위시리스트 삭제
-              </button>
+              </ConfirmDeleteButton>
             </form>
           </article>
         ))}

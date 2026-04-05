@@ -3,25 +3,30 @@ import { ExpenseForm } from "@/components/forms";
 import { ExpenseManager } from "@/components/expense-manager";
 import { Sidebar } from "@/components/sidebar";
 import { Topbar } from "@/components/topbar";
-import { getDashboardData } from "@/lib/data";
+import { getCurrentUser, getBudgetsWithCategories, getRecentExpenses } from "@/lib/data";
+import { getSession } from "@/lib/auth";
 
 export default async function ExpensesPage() {
-  const data = await getDashboardData();
-  const categories = data.budgets.flatMap((budget) => budget.categories);
+  const user = await getCurrentUser();
+  const session = await getSession();
+  const budgets = session ? await getBudgetsWithCategories(session) : [];
+  const categories = budgets.flatMap((b) => b.categories);
+  const categoryIds = categories.map((c) => c.id);
+  const expenses = await getRecentExpenses(categoryIds);
 
   return (
     <main className="flex min-h-screen bg-slate-50">
-      <Sidebar user={data.user?.name} />
-      <div className="flex-1 flex flex-col ml-72">
-        <Topbar name={data.user?.name} />
-        {!data.user ? (
+      <Sidebar user={user?.name} />
+      <div className="flex-1 flex flex-col ml-72 max-lg:ml-0">
+        <Topbar name={user?.name} />
+        {!user ? (
           <EmptyState
             title="로그인이 필요합니다."
             description="로그인 후 지출 내역을 추가, 수정, 삭제할 수 있습니다."
           />
         ) : (
           <>
-            <ExpenseForm budgets={data.budgets.map((b) => ({
+            <ExpenseForm budgets={budgets.map((b) => ({
               id: b.id,
               name: b.name,
               totalAmount: b.totalAmount,
@@ -34,7 +39,7 @@ export default async function ExpensesPage() {
               })),
             }))} />
             <ExpenseManager
-              expenses={data.expenses}
+              expenses={expenses}
               categories={categories.map((category) => ({ id: category.id, name: category.name }))}
             />
           </>

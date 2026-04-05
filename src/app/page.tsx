@@ -20,7 +20,7 @@ export default async function HomePage() {
   return (
     <main className="flex min-h-screen bg-slate-50">
       <Sidebar user={data.user?.name} />
-      <div className="flex-1 flex flex-col ml-72">
+      <div className="flex-1 flex flex-col ml-72 max-lg:ml-0">
         <Topbar name={data.user?.name} />
         <div className="flex-1 p-8 max-w-[1400px] mx-auto w-full">
 

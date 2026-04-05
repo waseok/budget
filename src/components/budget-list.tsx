@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 import { deleteBudget, deleteCategory, updateBudget, updateCategory } from "@/app/actions";
+import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { CurrencyInput } from "@/components/currency-input";
 import { SaveIcon, TrashIcon } from "@/components/icons";
 import { formatCurrency, formatDate } from "@/lib/format";
@@ -194,9 +195,12 @@ export function BudgetList({ budgets }: { budgets: BudgetItem[] }) {
                             </form>
                             <form action={deleteCategory} className="budget-cat-delete-form">
                               <input type="hidden" name="category_id" value={cat.id} />
-                              <button type="submit" className="danger-button btn-with-icon">
+                              <ConfirmDeleteButton
+                                className="danger-button btn-with-icon"
+                                message={`"${cat.name}" 항목을 삭제하시겠습니까? 이 항목의 지출 내역도 함께 삭제됩니다.`}
+                              >
                                 <TrashIcon className="btn-icon" />항목 삭제
-                              </button>
+                              </ConfirmDeleteButton>
                             </form>
                           </div>
                         )}
@@ -255,13 +259,17 @@ export function BudgetList({ budgets }: { budgets: BudgetItem[] }) {
                     <button type="submit" className="primary-button btn-with-icon">
                       <SaveIcon className="btn-icon" />수정 저장
                     </button>
-                    <form action={deleteBudget} style={{ flex: 1 }}>
-                      <input type="hidden" name="budget_id" value={budget.id} />
-                      <button type="submit" className="danger-button btn-with-icon" style={{ width: "100%" }}>
-                        <TrashIcon className="btn-icon" />예산 삭제
-                      </button>
-                    </form>
                   </div>
+                </form>
+                <form action={deleteBudget}>
+                  <input type="hidden" name="budget_id" value={budget.id} />
+                  <ConfirmDeleteButton
+                    className="danger-button btn-with-icon"
+                    style={{ width: "100%" }}
+                    message={`"${budget.name}" 예산을 삭제하시겠습니까? 하위 카테고리와 지출 내역도 함께 삭제됩니다.`}
+                  >
+                    <TrashIcon className="btn-icon" />예산 삭제
+                  </ConfirmDeleteButton>
                 </form>
               </div>
             </article>

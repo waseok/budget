@@ -1,6 +1,7 @@
 "use client";
 
 import { deleteExpense, updateExpense } from "@/app/actions";
+import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { CurrencyInput } from "@/components/currency-input";
 import { formatCurrency, formatDate } from "@/lib/format";
 
@@ -81,9 +82,12 @@ export function ExpenseManager({
             </form>
             <form action={deleteExpense} className="delete-form">
               <input type="hidden" name="expense_id" value={expense.id} />
-              <button type="submit" className="danger-button">
+              <ConfirmDeleteButton
+                className="danger-button"
+                message={`"${expense.title}" 지출을 삭제하시겠습니까?`}
+              >
                 지출 삭제
-              </button>
+              </ConfirmDeleteButton>
             </form>
           </article>
         ))}

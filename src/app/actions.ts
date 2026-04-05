@@ -31,6 +31,45 @@ async function requireUser() {
   return { supabase: await createClient(), user: user! };
 }
 
+async function requireOwnBudget(supabase: Awaited<ReturnType<typeof createClient>>, budgetId: string, userId: string) {
+  const { data } = await supabase.from("budgets").select("id").eq("id", budgetId).eq("user_id", userId).single();
+  if (!data) throw new Error("권한이 없거나 존재하지 않는 예산입니다.");
+  return data;
+}
+
+async function requireOwnCategory(supabase: Awaited<ReturnType<typeof createClient>>, categoryId: string, userId: string) {
+  const { data } = await supabase
+    .from("budget_categories")
+    .select("id, budget_id, budgets!inner(user_id)")
+    .eq("id", categoryId)
+    .eq("budgets.user_id", userId)
+    .single();
+  if (!data) throw new Error("권한이 없거나 존재하지 않는 카테고리입니다.");
+  return data;
+}
+
+async function requireOwnExpense(supabase: Awaited<ReturnType<typeof createClient>>, expenseId: string, userId: string) {
+  const { data } = await supabase
+    .from("expenses")
+    .select("id, category_id, budget_categories!inner(budget_id, budgets!inner(user_id))")
+    .eq("id", expenseId)
+    .eq("budget_categories.budgets.user_id", userId)
+    .single();
+  if (!data) throw new Error("권한이 없거나 존재하지 않는 지출입니다.");
+  return data;
+}
+
+async function requireOwnWishlist(supabase: Awaited<ReturnType<typeof createClient>>, wishlistId: string, userId: string) {
+  const { data } = await supabase
+    .from("wishlist_items")
+    .select("id")
+    .eq("id", wishlistId)
+    .eq("user_id", userId)
+    .single();
+  if (!data) throw new Error("권한이 없거나 존재하지 않는 위시리스트입니다.");
+  return data;
+}
+
 // ── Auth ──────────────────────────────────────────────────────────────────
 
 export async function signIn(
@@ -208,10 +247,12 @@ export async function deleteBudget(formData: FormData) {
 }
 
 export async function createCategory(formData: FormData) {
-  const { supabase } = await requireUser();
+  const { supabase, user } = await requireUser();
+  const budgetId = requiredString(formData, "budget_id");
+  await requireOwnBudget(supabase, budgetId, user.id);
 
   const { error } = await supabase.from("budget_categories").insert({
-    budget_id: requiredString(formData, "budget_id"),
+    budget_id: budgetId,
     name: optionalString(formData, "name") ?? "미분류",
     allocated_amount: requiredNumber(formData, "allocated_amount"),
     color: optionalString(formData, "color") ?? "#2563eb",
@@ -223,7 +264,9 @@ export async function createCategory(formData: FormData) {
 }
 
 export async function updateCategory(formData: FormData) {
-  const { supabase } = await requireUser();
+  const { supabase, user } = await requireUser();
+  const categoryId = requiredString(formData, "category_id");
+  await requireOwnCategory(supabase, categoryId, user.id);
 
   const { error } = await supabase
     .from("budget_categories")
@@ -232,7 +275,7 @@ export async function updateCategory(formData: FormData) {
       allocated_amount: requiredNumber(formData, "allocated_amount"),
       color: optionalString(formData, "color") ?? "#2563eb",
     })
-    .eq("id", requiredString(formData, "category_id"));
+    .eq("id", categoryId);
 
   if (error) throw new Error(error.message);
   revalidatePath("/");
@@ -240,12 +283,14 @@ export async function updateCategory(formData: FormData) {
 }
 
 export async function deleteCategory(formData: FormData) {
-  const { supabase } = await requireUser();
+  const { supabase, user } = await requireUser();
+  const categoryId = requiredString(formData, "category_id");
+  await requireOwnCategory(supabase, categoryId, user.id);
 
   const { error } = await supabase
     .from("budget_categories")
     .delete()
-    .eq("id", requiredString(formData, "category_id"));
+    .eq("id", categoryId);
 
   if (error) throw new Error(error.message);
   revalidatePath("/");
@@ -253,10 +298,12 @@ export async function deleteCategory(formData: FormData) {
 }
 
 export async function createExpense(formData: FormData) {
-  const { supabase } = await requireUser();
+  const { supabase, user } = await requireUser();
+  const categoryId = requiredString(formData, "category_id");
+  await requireOwnCategory(supabase, categoryId, user.id);
 
   const { error } = await supabase.from("expenses").insert({
-    category_id: requiredString(formData, "category_id"),
+    category_id: categoryId,
     title: requiredString(formData, "title"),
     amount: requiredNumber(formData, "amount"),
     spent_on: requiredString(formData, "spent_on"),
@@ -269,18 +316,22 @@ export async function createExpense(formData: FormData) {
 }
 
 export async function updateExpense(formData: FormData) {
-  const { supabase } = await requireUser();
+  const { supabase, user } = await requireUser();
+  const expenseId = requiredString(formData, "expense_id");
+  await requireOwnExpense(supabase, expenseId, user.id);
+  const categoryId = requiredString(formData, "category_id");
+  await requireOwnCategory(supabase, categoryId, user.id);
 
   const { error } = await supabase
     .from("expenses")
     .update({
-      category_id: requiredString(formData, "category_id"),
+      category_id: categoryId,
       title: requiredString(formData, "title"),
       amount: requiredNumber(formData, "amount"),
       spent_on: requiredString(formData, "spent_on"),
       note: optionalString(formData, "note"),
     })
-    .eq("id", requiredString(formData, "expense_id"));
+    .eq("id", expenseId);
 
   if (error) throw new Error(error.message);
   revalidatePath("/");
@@ -288,12 +339,14 @@ export async function updateExpense(formData: FormData) {
 }
 
 export async function deleteExpense(formData: FormData) {
-  const { supabase } = await requireUser();
+  const { supabase, user } = await requireUser();
+  const expenseId = requiredString(formData, "expense_id");
+  await requireOwnExpense(supabase, expenseId, user.id);
 
   const { error } = await supabase
     .from("expenses")
     .delete()
-    .eq("id", requiredString(formData, "expense_id"));
+    .eq("id", expenseId);
 
   if (error) throw new Error(error.message);
   revalidatePath("/");
@@ -321,7 +374,9 @@ export async function createWishlistItem(formData: FormData) {
 }
 
 export async function updateWishlistItem(formData: FormData) {
-  const { supabase } = await requireUser();
+  const { supabase, user } = await requireUser();
+  const wishlistId = requiredString(formData, "wishlist_id");
+  await requireOwnWishlist(supabase, wishlistId, user.id);
   const expectedPrice = optionalString(formData, "expected_price");
 
   const { error } = await supabase
@@ -335,7 +390,7 @@ export async function updateWishlistItem(formData: FormData) {
       priority: requiredString(formData, "priority"),
       memo: optionalString(formData, "memo"),
     })
-    .eq("id", requiredString(formData, "wishlist_id"));
+    .eq("id", wishlistId);
 
   if (error) throw new Error(error.message);
   revalidatePath("/");
@@ -343,12 +398,14 @@ export async function updateWishlistItem(formData: FormData) {
 }
 
 export async function deleteWishlistItem(formData: FormData) {
-  const { supabase } = await requireUser();
+  const { supabase, user } = await requireUser();
+  const wishlistId = requiredString(formData, "wishlist_id");
+  await requireOwnWishlist(supabase, wishlistId, user.id);
 
   const { error } = await supabase
     .from("wishlist_items")
     .delete()
-    .eq("id", requiredString(formData, "wishlist_id"));
+    .eq("id", wishlistId);
 
   if (error) throw new Error(error.message);
   revalidatePath("/");
