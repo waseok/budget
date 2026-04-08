@@ -15,6 +15,7 @@ type ExpenseItem = {
   note: string | null;
   categoryId: string;
   categoryName: string;
+  budgetName: string;
 };
 
 type CategoryOption = {
@@ -87,7 +88,7 @@ export function ExpenseManager({
                     {expense.title}
                   </p>
                   <p style={{ margin: "2px 0 0", fontSize: "0.75rem", color: "var(--muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                    {expense.categoryName} · {formatDate(expense.spentOn)}
+                    {expense.budgetName} - {expense.categoryName} · {formatDate(expense.spentOn)}
                   </p>
                   <p style={{ margin: "2px 0 0", fontSize: "0.82rem", fontWeight: 600, color: "var(--blue)" }}>
                     {formatCurrency(expense.amount)}

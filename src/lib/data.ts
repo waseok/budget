@@ -38,6 +38,7 @@ export type ExpenseItem = {
   note: string | null;
   categoryId: string;
   categoryName: string;
+  budgetName: string;
 };
 
 export type WishlistItem = {
@@ -105,23 +106,29 @@ type RawExpense = {
   spent_on: string;
   note: string | null;
   category_id: string;
-  budget_categories: { name?: string } | { name?: string }[] | null;
+  budget_categories: { name?: string; budgets?: { name?: string } | { name?: string }[] | null } | { name?: string; budgets?: { name?: string } | { name?: string }[] | null }[] | null;
 };
+
+function extractName(field: { name?: string } | { name?: string }[] | null | undefined): string {
+  if (Array.isArray(field)) return field[0]?.name ?? "미분류";
+  return field?.name ?? "미분류";
+}
 
 function mapExpenses(raw: unknown[] | null): ExpenseItem[] {
   return (
-    (raw as RawExpense[] | null)?.map((e) => ({
-      id: e.id,
-      title: e.title,
-      amount: Number(e.amount),
-      spentOn: e.spent_on,
-      note: e.note,
-      categoryId: e.category_id,
-      categoryName:
-        Array.isArray(e.budget_categories) && e.budget_categories[0]
-          ? e.budget_categories[0].name ?? "미분류"
-          : (e.budget_categories as { name?: string } | null)?.name ?? "미분류",
-    })) ?? []
+    (raw as RawExpense[] | null)?.map((e) => {
+      const cat = Array.isArray(e.budget_categories) ? e.budget_categories[0] : e.budget_categories;
+      return {
+        id: e.id,
+        title: e.title,
+        amount: Number(e.amount),
+        spentOn: e.spent_on,
+        note: e.note,
+        categoryId: e.category_id,
+        categoryName: cat?.name ?? "미분류",
+        budgetName: extractName(cat?.budgets ?? null),
+      };
+    }) ?? []
   );
 }
 
@@ -178,7 +185,7 @@ export const getRecentExpenses = cache(async (categoryIds: string[]): Promise<Ex
   const supabase = await createClient();
   const { data } = await supabase
     .from("expenses")
-    .select("id, title, amount, spent_on, note, category_id, budget_categories(name)")
+    .select("id, title, amount, spent_on, note, category_id, budget_categories(name, budgets(name))")
     .in("category_id", categoryIds)
     .order("spent_on", { ascending: false })
     .limit(20);
