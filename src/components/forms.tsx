@@ -91,6 +91,7 @@ type BudgetWithCategories = {
   categories: Array<{
     id: string;
     name: string;
+    color?: string;
     allocatedAmount: number;
     spentAmount: number;
   }>;
@@ -148,24 +149,38 @@ export function ExpenseForm({ budgets }: { budgets: BudgetWithCategories[] }) {
       )}
       <label>
         <span>세부 항목</span>
-        <select
-          name="category_id"
-          value={selectedCategoryId}
-          onChange={(e) => setSelectedCategoryId(e.target.value)}
-          required
-          disabled={!selectedBudgetId}
-        >
-          <option value="" disabled>
-            {!selectedBudgetId
-              ? "예산을 먼저 선택하세요"
-              : filteredCategories.length === 0
-              ? "이 예산에 세부 항목이 없습니다"
-              : "세부 항목 선택"}
-          </option>
-          {filteredCategories.map((c) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
-        </select>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {selectedCategory?.color && (
+            <span
+              style={{
+                width: 10,
+                height: 10,
+                borderRadius: "50%",
+                background: selectedCategory.color,
+                flexShrink: 0,
+              }}
+            />
+          )}
+          <select
+            name="category_id"
+            value={selectedCategoryId}
+            onChange={(e) => setSelectedCategoryId(e.target.value)}
+            required
+            disabled={!selectedBudgetId}
+            style={{ flex: 1 }}
+          >
+            <option value="" disabled>
+              {!selectedBudgetId
+                ? "예산을 먼저 선택하세요"
+                : filteredCategories.length === 0
+                ? "이 예산에 세부 항목이 없습니다"
+                : "세부 항목 선택"}
+            </option>
+            {filteredCategories.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        </div>
       </label>
       {selectedCategory && (
         <div className="balance-info">
