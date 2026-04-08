@@ -34,13 +34,14 @@ export default async function ExpensesPage() {
               categories: b.categories.map((c) => ({
                 id: c.id,
                 name: c.name,
+                color: c.color,
                 allocatedAmount: c.allocatedAmount,
                 spentAmount: c.spentAmount,
               })),
             }))} />
             <ExpenseManager
               expenses={expenses}
-              categories={categories.map((category) => ({ id: category.id, name: category.name }))}
+              categories={categories.map((category) => ({ id: category.id, name: category.name, color: category.color }))}
             />
           </>
         )}
