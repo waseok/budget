@@ -8,8 +8,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Inter", "Apple SD Gothic Neo", "Noto Sans KR", "sans-serif"],
-        headline: ["Manrope", "sans-serif"],
+        sans: ["var(--font-gong)", "Apple SD Gothic Neo", "Noto Sans KR", "sans-serif"],
+        headline: ["var(--font-gong)", "sans-serif"],
       },
       colors: {
         primary: {

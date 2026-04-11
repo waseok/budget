@@ -4,7 +4,8 @@
 
 @layer utilities {
   .font-headline {
-    font-family: "Manrope", sans-serif;
+    font-family: var(--font-gong), sans-serif;
+    font-weight: 700;
   }
 }
 
@@ -33,7 +34,7 @@ body {
   min-height: 100vh;
   background: var(--bg);
   color: var(--text);
-  font-family: "Inter", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  font-family: var(--font-gong), "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
   font-size: 15px;
   line-height: 1.5;
 }
