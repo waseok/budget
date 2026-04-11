@@ -16,14 +16,14 @@ export default async function BudgetsPage() {
       <Sidebar user={user?.name} />
       <div className="flex-1 flex flex-col ml-72 max-lg:ml-0">
         <Topbar name={user?.name} />
-        <div className="flex-1 p-8">
+        <div className="flex-1 p-8 max-w-4xl mx-auto w-full">
         {!user ? (
           <EmptyState
             title="로그인이 필요합니다."
             description="로그인 후 예산을 추가하고 수정하거나 삭제할 수 있습니다."
           />
         ) : (
-          <>
+          <div className="space-y-8">
             <section className="section-stack">
               <div className="section-heading">
                 <div>
@@ -43,7 +43,7 @@ export default async function BudgetsPage() {
               <CategoryForm budgets={budgets.map((budget) => ({ id: budget.id, name: budget.name }))} />
             </section>
             <BudgetList budgets={budgets} />
-          </>
+          </div>
         )}
         </div>
       </div>

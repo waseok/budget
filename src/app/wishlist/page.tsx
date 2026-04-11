@@ -18,20 +18,22 @@ export default async function WishlistPage() {
       <Sidebar user={user?.name} />
       <div className="flex-1 flex flex-col ml-72 max-lg:ml-0">
         <Topbar name={user?.name} />
+        <div className="flex-1 p-8 max-w-4xl mx-auto w-full">
         {!user ? (
           <EmptyState
             title="로그인이 필요합니다."
             description="로그인 후 위시리스트를 추가, 수정, 삭제할 수 있습니다."
           />
         ) : (
-          <>
+          <div className="space-y-8">
             <WishlistForm categories={categories.map((category) => ({ id: category.id, name: category.name }))} />
             <WishlistManager
               items={wishlistItems}
               categories={categories.map((category) => ({ id: category.id, name: category.name }))}
             />
-          </>
+          </div>
         )}
+        </div>
       </div>
     </main>
   );
