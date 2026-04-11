@@ -1,5 +1,7 @@
 import { deleteWishlistItem, updateWishlistItem } from "@/app/actions";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
+import { CurrencyInput } from "@/components/currency-input";
+import { WishlistThumbnail } from "@/components/wishlist-thumbnail";
 import { formatCurrency } from "@/lib/format";
 
 type WishlistItem = {
@@ -37,7 +39,10 @@ export function WishlistManager({
         {items.map((item) => (
           <article key={item.id} className="manager-item">
             <div className="manager-header">
-              <div>
+              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-slate-100 bg-slate-50">
+                <WishlistThumbnail imageUrl={item.imageUrl} title={item.title} sizes="56px" />
+              </div>
+              <div className="min-w-0 flex-1">
                 <h3>{item.title}</h3>
                 <p className="muted">
                   {formatCurrency(item.expectedPrice ?? 0)} · 우선순위 {item.priority}
@@ -55,21 +60,19 @@ export function WishlistManager({
                 <input name="product_url" type="url" defaultValue={item.productUrl ?? ""} />
               </label>
               <label>
-                <span>이미지 URL</span>
+                <span>썸네일 이미지 URL</span>
                 <input name="image_url" type="url" defaultValue={item.imageUrl ?? ""} />
               </label>
               <label>
                 <span>예상 가격</span>
-                <input
+                <CurrencyInput
                   name="expected_price"
-                  type="number"
-                  min="0"
-                  step="1000"
-                  defaultValue={item.expectedPrice ?? 0}
+                  defaultValue={item.expectedPrice ?? undefined}
+                  placeholder="10원 단위까지 입력 가능"
                 />
               </label>
               <label>
-                <span>연결 예산 항목</span>
+                <span>연결 예산 세부 항목</span>
                 <select name="category_id" defaultValue={item.categoryId ?? ""}>
                   <option value="">선택 안 함</option>
                   {categories.map((category) => (

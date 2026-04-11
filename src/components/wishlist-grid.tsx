@@ -1,6 +1,5 @@
-import Image from "next/image";
-
 import { formatCurrency } from "@/lib/format";
+import { WishlistThumbnail } from "@/components/wishlist-thumbnail";
 
 type WishlistItem = {
   id: string;
@@ -24,17 +23,6 @@ const priorityClasses = {
   high: "bg-red-50 text-red-700",
 };
 
-function isAllowedImage(url: string | null) {
-  if (!url) return false;
-
-  try {
-    const parsed = new URL(url);
-    return ["images.unsplash.com", "www.gimkit.com", "gimkit.com"].includes(parsed.hostname);
-  } catch {
-    return false;
-  }
-}
-
 export function WishlistGrid({ items }: { items: WishlistItem[] }) {
   return (
     <section className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 h-full">
@@ -56,15 +44,10 @@ export function WishlistGrid({ items }: { items: WishlistItem[] }) {
         <p className="text-sm text-slate-400 py-4 text-center">위시리스트가 비어 있습니다.</p>
       ) : (
         <div className="grid grid-cols-2 gap-3">
-          {items.map((item) => {
-            const imageSrc = isAllowedImage(item.imageUrl)
-              ? item.imageUrl!
-              : "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80";
-
-            return (
+          {items.map((item) => (
               <article key={item.id} className="overflow-hidden rounded-2xl border border-slate-100 bg-white">
                 <div className="relative aspect-video">
-                  <Image src={imageSrc} alt={item.title} fill className="object-cover" />
+                  <WishlistThumbnail imageUrl={item.imageUrl} title={item.title} />
                 </div>
                 <div className="p-3 grid gap-2">
                   <div className="grid gap-1.5">
@@ -93,8 +76,7 @@ export function WishlistGrid({ items }: { items: WishlistItem[] }) {
                   </div>
                 </div>
               </article>
-            );
-          })}
+          ))}
         </div>
       )}
     </section>

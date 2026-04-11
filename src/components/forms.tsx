@@ -236,18 +236,22 @@ export function WishlistForm({ categories }: { categories: Option[] }) {
         <input name="product_url" type="url" placeholder="https://..." />
       </label>
       <label>
-        <span>이미지 URL</span>
-        <input name="image_url" type="url" placeholder="https://..." />
+        <span>썸네일 이미지 URL</span>
+        <input name="image_url" type="url" placeholder="https://... (카드에 미리보기로 표시)" />
       </label>
+      <p className="field-help">
+        상품 페이지의 이미지 주소를 넣으면 목록·대시보드 카드에 썸네일로 보입니다. 일부 쇼핑몰은
+        외부 링크를 막을 수 있어, 그때는 이미지를 직접 호스팅한 주소를 쓰거나 비워 두세요.
+      </p>
       <label>
         <span>예상 가격</span>
         <CurrencyInput name="expected_price" placeholder="89,000" />
       </label>
       <label>
-        <span>연결 예산 항목</span>
+        <span>연결 예산 세부 항목</span>
         <select name="category_id" defaultValue="" disabled={categories.length === 0}>
           <option value="">
-            {categories.length === 0 ? "먼저 예산 항목을 추가해주세요" : "선택 안 함"}
+            {categories.length === 0 ? "먼저 예산 탭에서 세부 항목을 추가해주세요" : "선택 안 함"}
           </option>
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
@@ -257,8 +261,8 @@ export function WishlistForm({ categories }: { categories: Option[] }) {
         </select>
       </label>
       <p className="field-help">
-        예산만 추가하면 여기 드롭다운에는 보이지 않고, 예산 안에 항목을 추가해야 선택할 수
-        있습니다.
+        예산(월/분기 등)만 만들면 목록에 안 나옵니다. 예산 탭에서 만든 세부 항목(카테고리)만
+        여기서 고를 수 있습니다.
       </p>
       <label>
         <span>우선순위</span>
