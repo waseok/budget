@@ -10,7 +10,11 @@ export default async function WishlistPage() {
   const user = await getCurrentUser();
   const session = await getSession();
   const budgets = session ? await getBudgetsWithCategories(session) : [];
-  const categories = budgets.flatMap((b) => b.categories);
+  const budgetsForWishlist = budgets.map((b) => ({
+    id: b.id,
+    name: b.name,
+    categories: b.categories.map((c) => ({ id: c.id, name: c.name })),
+  }));
   const wishlistItems = user ? await getWishlistItems(user.id) : [];
 
   return (
@@ -26,11 +30,8 @@ export default async function WishlistPage() {
           />
         ) : (
           <div className="space-y-8">
-            <WishlistForm categories={categories.map((category) => ({ id: category.id, name: category.name }))} />
-            <WishlistManager
-              items={wishlistItems}
-              categories={categories.map((category) => ({ id: category.id, name: category.name }))}
-            />
+            <WishlistForm budgets={budgetsForWishlist} />
+            <WishlistManager items={wishlistItems} budgets={budgetsForWishlist} />
           </div>
         )}
         </div>

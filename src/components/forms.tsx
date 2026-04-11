@@ -97,6 +97,13 @@ type BudgetWithCategories = {
   }>;
 };
 
+/** 위시리스트: 통예산 → 세부 항목 선택용 (금액 불필요) */
+export type BudgetForWishlist = {
+  id: string;
+  name: string;
+  categories: Array<{ id: string; name: string }>;
+};
+
 export function ExpenseForm({ budgets }: { budgets: BudgetWithCategories[] }) {
   const [selectedBudgetId, setSelectedBudgetId] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
@@ -220,7 +227,14 @@ export function ExpenseForm({ budgets }: { budgets: BudgetWithCategories[] }) {
   );
 }
 
-export function WishlistForm({ categories }: { categories: Option[] }) {
+export function WishlistForm({ budgets }: { budgets: BudgetForWishlist[] }) {
+  const [selectedBudgetId, setSelectedBudgetId] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
+
+  const selectedBudget = budgets.find((b) => b.id === selectedBudgetId);
+  const filteredCategories = selectedBudget?.categories ?? [];
+  const noBudgets = budgets.length === 0;
+
   return (
     <form action={createWishlistItem} className="form-card clean-card">
       <div className="form-heading">
@@ -248,21 +262,50 @@ export function WishlistForm({ categories }: { categories: Option[] }) {
         <CurrencyInput name="expected_price" placeholder="89,000" />
       </label>
       <label>
-        <span>연결 예산 세부 항목</span>
-        <select name="category_id" defaultValue="" disabled={categories.length === 0}>
-          <option value="">
-            {categories.length === 0 ? "먼저 예산 탭에서 세부 항목을 추가해주세요" : "선택 안 함"}
+        <span>통예산</span>
+        <select
+          value={selectedBudgetId}
+          onChange={(e) => {
+            setSelectedBudgetId(e.target.value);
+            setSelectedCategoryId("");
+          }}
+          disabled={noBudgets}
+        >
+          <option value="" disabled>
+            {noBudgets ? "먼저 예산 탭에서 예산을 추가해주세요" : "예산 선택"}
           </option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
+          {budgets.map((b) => (
+            <option key={b.id} value={b.id}>
+              {b.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label>
+        <span>연결 예산 세부 항목</span>
+        <select
+          name="category_id"
+          value={selectedCategoryId}
+          onChange={(e) => setSelectedCategoryId(e.target.value)}
+          disabled={!selectedBudgetId}
+        >
+          <option value="">
+            {!selectedBudgetId
+              ? "먼저 통예산을 선택하세요"
+              : filteredCategories.length === 0
+                ? "이 예산에 세부 항목이 없습니다"
+                : "선택 안 함"}
+          </option>
+          {filteredCategories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
             </option>
           ))}
         </select>
       </label>
       <p className="field-help">
-        예산(월/분기 등)만 만들면 목록에 안 나옵니다. 예산 탭에서 만든 세부 항목(카테고리)만
-        여기서 고를 수 있습니다.
+        통예산을 고른 뒤, 그 안의 세부 항목만 연결할 수 있습니다. 예산 탭에서 세부 항목을 추가해야
+        드롭다운에 나타납니다.
       </p>
       <label>
         <span>우선순위</span>
