@@ -80,7 +80,7 @@ export function Sidebar({ user }: { user?: string | null }) {
         <div className="px-6 pt-8 pb-6">
           <p className="text-xs font-medium text-slate-400 uppercase tracking-widest mb-1">Premium Wealth Management</p>
           <h2
-            className="font-headline text-xl font-bold leading-tight"
+            className="font-headline text-xl font-medium leading-tight"
             style={{ background: "linear-gradient(135deg, #1d4ed8, #3b82f6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}
           >
             Financial Atelier
@@ -121,11 +121,11 @@ export function Sidebar({ user }: { user?: string | null }) {
           {user ? (
             <div className="bg-slate-50/50 rounded-3xl p-4">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-headline font-semibold text-sm flex-shrink-0">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-headline font-medium text-sm flex-shrink-0">
                   {user.charAt(0).toUpperCase()}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-slate-800 truncate">{user}님</p>
+                  <p className="text-sm font-medium text-slate-800 truncate">{user}님</p>
                   <p className="text-xs text-slate-400">회원</p>
                 </div>
               </div>

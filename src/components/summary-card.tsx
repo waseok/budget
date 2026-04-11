@@ -29,9 +29,9 @@ export function SummaryCard({
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${classes.icon}`}>
           {icon}
         </div>
-        <p className={`text-xs font-semibold uppercase tracking-wide font-headline ${classes.label}`}>{label}</p>
+        <p className={`text-xs font-medium uppercase tracking-wide font-headline ${classes.label}`}>{label}</p>
       </div>
-      <h3 className="text-xl font-bold text-slate-900 font-headline m-0">{value}</h3>
+      <h3 className="text-xl font-medium text-slate-900 font-headline m-0">{value}</h3>
       <p className="text-xs text-slate-400 mt-1 m-0">{helper}</p>
     </article>
   );

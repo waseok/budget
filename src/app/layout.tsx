@@ -6,7 +6,6 @@ const gongGothic = localFont({
   src: [
     { path: "../fonts/GongGothic-Light.otf", weight: "300", style: "normal" },
     { path: "../fonts/GongGothic-Medium.otf", weight: "500", style: "normal" },
-    { path: "../fonts/GongGothic-Bold.otf", weight: "700", style: "normal" },
   ],
   variable: "--font-gong",
   display: "swap",

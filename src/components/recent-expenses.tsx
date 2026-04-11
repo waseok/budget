@@ -14,14 +14,14 @@ export function RecentExpenses({ expenses }: { expenses: ExpenseItem[] }) {
     <section className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 h-full">
       <div className="flex items-center justify-between mb-5">
         <div>
-          <p className="text-xs font-semibold text-blue-600 uppercase tracking-widest mb-1 font-headline">
+          <p className="text-xs font-medium text-blue-600 uppercase tracking-widest mb-1 font-headline">
             최근 활동
           </p>
-          <h2 className="text-lg font-bold text-slate-900 font-headline m-0">최근 지출 내역</h2>
+          <h2 className="text-lg font-medium text-slate-900 font-headline m-0">최근 지출 내역</h2>
         </div>
         <a
           href="/expenses"
-          className="text-sm font-semibold text-blue-600 hover:text-blue-700 font-headline transition-colors"
+          className="text-sm font-medium text-blue-600 hover:text-blue-700 font-headline transition-colors"
         >
           전체 보기
         </a>
@@ -45,13 +45,13 @@ export function RecentExpenses({ expenses }: { expenses: ExpenseItem[] }) {
                   </span>
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-slate-800 truncate">{expense.title}</p>
+                  <p className="text-sm font-medium text-slate-800 truncate">{expense.title}</p>
                   <p className="text-xs text-slate-400 truncate">
                     {expense.categoryName ?? expense.category ?? "미분류"} · {formatDate(expense.spentOn)}
                   </p>
                 </div>
               </div>
-              <strong className="text-sm font-bold text-slate-800 font-headline flex-shrink-0">
+              <strong className="text-sm font-medium text-slate-800 font-headline flex-shrink-0">
                 {formatCurrency(expense.amount)}
               </strong>
             </article>

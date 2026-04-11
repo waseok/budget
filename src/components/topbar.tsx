@@ -28,7 +28,7 @@ export function Topbar({ name }: { name?: string | null }) {
         {name ? (
           <div className="flex items-center gap-3">
             <span className="text-sm font-medium text-slate-700 font-headline max-sm:hidden">{name}님</span>
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-headline font-semibold text-sm flex-shrink-0">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-headline font-medium text-sm flex-shrink-0">
               {name.charAt(0).toUpperCase()}
             </div>
             <form action={signOut}>
