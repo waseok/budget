@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createSession, deleteSession, getSession, hashPassword, verifyPassword } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -25,19 +25,21 @@ function requiredNumber(formData: FormData, key: string) {
   return value;
 }
 
+type AdminClient = ReturnType<typeof createAdminClient>;
+
 async function requireUser() {
   const user = await getSession();
   if (!user) redirect("/login");
-  return { supabase: await createClient(), user: user! };
+  return { supabase: createAdminClient(), user: user! };
 }
 
-async function requireOwnBudget(supabase: Awaited<ReturnType<typeof createClient>>, budgetId: string, userId: string) {
+async function requireOwnBudget(supabase: AdminClient, budgetId: string, userId: string) {
   const { data } = await supabase.from("budgets").select("id").eq("id", budgetId).eq("user_id", userId).single();
   if (!data) throw new Error("권한이 없거나 존재하지 않는 예산입니다.");
   return data;
 }
 
-async function requireOwnCategory(supabase: Awaited<ReturnType<typeof createClient>>, categoryId: string, userId: string) {
+async function requireOwnCategory(supabase: AdminClient, categoryId: string, userId: string) {
   const { data } = await supabase
     .from("budget_categories")
     .select("id, budget_id, budgets!inner(user_id)")
@@ -48,7 +50,7 @@ async function requireOwnCategory(supabase: Awaited<ReturnType<typeof createClie
   return data;
 }
 
-async function requireOwnExpense(supabase: Awaited<ReturnType<typeof createClient>>, expenseId: string, userId: string) {
+async function requireOwnExpense(supabase: AdminClient, expenseId: string, userId: string) {
   const { data } = await supabase
     .from("expenses")
     .select("id, category_id, budget_categories!inner(budget_id, budgets!inner(user_id))")
@@ -59,7 +61,7 @@ async function requireOwnExpense(supabase: Awaited<ReturnType<typeof createClien
   return data;
 }
 
-async function requireOwnWishlist(supabase: Awaited<ReturnType<typeof createClient>>, wishlistId: string, userId: string) {
+async function requireOwnWishlist(supabase: AdminClient, wishlistId: string, userId: string) {
   const { data } = await supabase
     .from("wishlist_items")
     .select("id")
@@ -79,36 +81,21 @@ export async function signIn(
   const username = requiredString(formData, "username");
   const password = requiredString(formData, "password");
 
-  try {
-    const supabase = await createClient();
-    const { data: user, error: userQueryError } = await supabase
-      .from("app_users")
-      .select("id, password_hash")
-      .eq("username", username)
-      .single();
+  const supabase = createAdminClient();
+  const { data: user } = await supabase
+    .from("app_users")
+    .select("id, password_hash")
+    .eq("username", username)
+    .single();
 
-    if (userQueryError) {
-      console.error("[auth.signIn] app_users query failed", {
-        message: userQueryError.message,
-        code: userQueryError.code,
-        details: userQueryError.details,
-        hint: userQueryError.hint,
-      });
-      return { error: "로그인 조회 중 오류가 발생했습니다. 서버 로그를 확인해주세요." };
-    }
-
-    if (!user || !verifyPassword(password, user.password_hash)) {
-      return { error: "아이디 또는 비밀번호가 올바르지 않습니다." };
-    }
-
-    const autoLogin = formData.get("auto_login") === "on";
-    await createSession(user.id, autoLogin ? 365 : 1);
-    revalidatePath("/", "layout");
-    redirect("/");
-  } catch (error) {
-    console.error("[auth.signIn] unexpected error", error);
-    return { error: "로그인 처리 중 예외가 발생했습니다. 서버 로그를 확인해주세요." };
+  if (!user || !verifyPassword(password, user.password_hash)) {
+    return { error: "아이디 또는 비밀번호가 올바르지 않습니다." };
   }
+
+  const autoLogin = formData.get("auto_login") === "on";
+  await createSession(user.id, autoLogin ? 365 : 1);
+  revalidatePath("/", "layout");
+  redirect("/");
 }
 
 export async function signUp(
@@ -126,7 +113,7 @@ export async function signUp(
   if (password.length < 6) return { error: "비밀번호는 6자 이상이어야 합니다." };
   if (username.length < 2) return { error: "아이디는 2자 이상이어야 합니다." };
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { data: existing } = await supabase
     .from("app_users")
@@ -166,7 +153,7 @@ export async function getSecurityQuestion(
 ): Promise<{ error: string; question?: string; username?: string }> {
   const username = requiredString(formData, "username");
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: user } = await supabase
     .from("app_users")
     .select("security_question")
@@ -189,7 +176,7 @@ export async function resetPassword(
   if (newPassword !== confirmPassword) return { error: "비밀번호가 일치하지 않습니다." };
   if (newPassword.length < 6) return { error: "비밀번호는 6자 이상이어야 합니다." };
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data: user } = await supabase
     .from("app_users")
     .select("id, security_answer_hash")
