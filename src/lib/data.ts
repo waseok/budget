@@ -53,6 +53,12 @@ export type WishlistItem = {
   categoryId: string | null;
 };
 
+export type WishlistBudgetOption = {
+  id: string;
+  name: string;
+  categories: Array<{ id: string; name: string }>;
+};
+
 // Keep backward compat for pages that still use the combined type
 export type DashboardData = {
   user: UserInfo | null;
@@ -181,6 +187,27 @@ export const getBudgetsWithCategories = cache(async (user: SessionUser): Promise
     .eq("user_id", user.id)
     .order("created_at", { ascending: true });
   return mapBudgets(data);
+});
+
+export const getBudgetsForWishlist = cache(async (userId: string): Promise<WishlistBudgetOption[]> => {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("budgets")
+    .select("id, name, budget_categories(id, name)")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: true });
+
+  return (
+    data?.map((budget) => ({
+      id: budget.id,
+      name: budget.name,
+      categories:
+        budget.budget_categories?.map((category) => ({
+          id: category.id,
+          name: category.name,
+        })) ?? [],
+    })) ?? []
+  );
 });
 
 export const getRecentExpenses = cache(async (categoryIds: string[]): Promise<ExpenseItem[]> => {

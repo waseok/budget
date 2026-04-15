@@ -313,6 +313,11 @@ button, input, select, textarea { font: inherit; }
 .delete-form { display: flex; justify-content: flex-end; }
 .manager-header { display: flex; align-items: center; justify-content: flex-start; gap: 12px; }
 .manager-actions { display: flex; justify-content: flex-start; }
+.wishlist-details-toggle {
+  margin-left: auto;
+  flex-shrink: 0;
+  min-width: 96px;
+}
 .form-heading { display: grid; gap: 3px; }
 .field-help { margin: -2px 0 0; color: var(--muted); font-size: 0.82rem; line-height: 1.4; }
 

@@ -19,30 +19,47 @@ function isLikelyImageUrl(raw: string) {
   }
 }
 
+function getHostname(raw: string): string | null {
+  try {
+    return new URL(raw).hostname;
+  } catch {
+    return null;
+  }
+}
+
 type Props = {
   imageUrl: string | null;
   title: string;
   sizes?: string;
+  priority?: boolean;
 };
 
-export function WishlistThumbnail({ imageUrl, title, sizes = "(max-width: 768px) 50vw, 200px" }: Props) {
+export function WishlistThumbnail({
+  imageUrl,
+  title,
+  sizes = "(max-width: 768px) 50vw, 200px",
+  priority = false,
+}: Props) {
   const [usePlaceholder, setUsePlaceholder] = useState(false);
   const trimmed = imageUrl?.trim() ?? "";
   const url = trimmed && isLikelyImageUrl(trimmed) && !usePlaceholder ? trimmed : null;
+  const hostname = url ? getHostname(url) : null;
+  const canUseNextImage = hostname ? isNextImageHost(hostname) : false;
 
   if (!url) {
     return (
-      <Image src={PLACEHOLDER} alt={title} fill className="object-cover" sizes={sizes} />
+      <Image src={PLACEHOLDER} alt={title} fill className="object-cover" sizes={sizes} priority={priority} />
     );
   }
 
-  try {
-    const host = new URL(url).hostname;
-    if (isNextImageHost(host)) {
-      return <Image src={url} alt={title} fill className="object-cover" sizes={sizes} />;
-    }
-  } catch {
-    return <Image src={PLACEHOLDER} alt={title} fill className="object-cover" sizes={sizes} />;
+  if (!hostname) {
+    return (
+      <Image src={PLACEHOLDER} alt={title} fill className="object-cover" sizes={sizes} priority={priority} />
+    );
+  }
+
+  if (canUseNextImage) {
+    return <Image src={url} alt={title} fill className="object-cover" sizes={sizes} priority={priority} />;
   }
 
   return (
@@ -50,7 +67,7 @@ export function WishlistThumbnail({ imageUrl, title, sizes = "(max-width: 768px)
       src={url}
       alt={title}
       className="absolute inset-0 h-full w-full object-cover"
-      loading="lazy"
+      loading={priority ? "eager" : "lazy"}
       referrerPolicy="no-referrer"
       onError={() => setUsePlaceholder(true)}
     />

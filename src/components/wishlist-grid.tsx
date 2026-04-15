@@ -47,10 +47,15 @@ export function WishlistGrid({ items }: { items: WishlistItem[] }) {
         <p className="text-sm text-slate-400 py-4 text-center">위시리스트가 비어 있습니다.</p>
       ) : (
         <div className="grid grid-cols-2 gap-3">
-          {visibleItems.map((item) => (
+          {visibleItems.map((item, index) => (
               <article key={item.id} className="overflow-hidden rounded-2xl border border-slate-100 bg-white">
                 <div className="relative aspect-video">
-                  <WishlistThumbnail imageUrl={item.imageUrl} title={item.title} />
+                  <WishlistThumbnail
+                    imageUrl={item.imageUrl}
+                    title={item.title}
+                    sizes="(max-width: 768px) 50vw, (max-width: 1200px) 30vw, 240px"
+                    priority={index < 2}
+                  />
                 </div>
                 <div className="p-3 grid gap-2">
                   <div className="grid gap-1.5">

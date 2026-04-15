@@ -3,19 +3,21 @@ import { WishlistForm } from "@/components/forms";
 import { WishlistManager } from "@/components/wishlist-manager";
 import { Sidebar } from "@/components/sidebar";
 import { Topbar } from "@/components/topbar";
-import { getCurrentUser, getBudgetsWithCategories, getWishlistItems } from "@/lib/data";
+import { getBudgetsForWishlist, getWishlistItems } from "@/lib/data";
 import { getSession } from "@/lib/auth";
 
 export default async function WishlistPage() {
-  const user = await getCurrentUser();
   const session = await getSession();
-  const budgets = session ? await getBudgetsWithCategories(session) : [];
-  const budgetsForWishlist = budgets.map((b) => ({
-    id: b.id,
-    name: b.name,
-    categories: b.categories.map((c) => ({ id: c.id, name: c.name })),
-  }));
-  const wishlistItems = user ? await getWishlistItems(user.id) : [];
+  const user = session
+    ? { id: session.id, name: session.name, username: session.username }
+    : null;
+
+  const [budgetsForWishlist, wishlistItems] = session
+    ? await Promise.all([
+        getBudgetsForWishlist(session.id),
+        getWishlistItems(session.id),
+      ])
+    : [[], []];
 
   return (
     <main className="flex min-h-screen bg-slate-50">
