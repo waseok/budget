@@ -79,21 +79,36 @@ export async function signIn(
   const username = requiredString(formData, "username");
   const password = requiredString(formData, "password");
 
-  const supabase = await createClient();
-  const { data: user } = await supabase
-    .from("app_users")
-    .select("id, password_hash")
-    .eq("username", username)
-    .single();
+  try {
+    const supabase = await createClient();
+    const { data: user, error: userQueryError } = await supabase
+      .from("app_users")
+      .select("id, password_hash")
+      .eq("username", username)
+      .single();
 
-  if (!user || !verifyPassword(password, user.password_hash)) {
-    return { error: "아이디 또는 비밀번호가 올바르지 않습니다." };
+    if (userQueryError) {
+      console.error("[auth.signIn] app_users query failed", {
+        message: userQueryError.message,
+        code: userQueryError.code,
+        details: userQueryError.details,
+        hint: userQueryError.hint,
+      });
+      return { error: "로그인 조회 중 오류가 발생했습니다. 서버 로그를 확인해주세요." };
+    }
+
+    if (!user || !verifyPassword(password, user.password_hash)) {
+      return { error: "아이디 또는 비밀번호가 올바르지 않습니다." };
+    }
+
+    const autoLogin = formData.get("auto_login") === "on";
+    await createSession(user.id, autoLogin ? 365 : 1);
+    revalidatePath("/", "layout");
+    redirect("/");
+  } catch (error) {
+    console.error("[auth.signIn] unexpected error", error);
+    return { error: "로그인 처리 중 예외가 발생했습니다. 서버 로그를 확인해주세요." };
   }
-
-  const autoLogin = formData.get("auto_login") === "on";
-  await createSession(user.id, autoLogin ? 365 : 1);
-  revalidatePath("/", "layout");
-  redirect("/");
 }
 
 export async function signUp(
@@ -391,6 +406,27 @@ export async function updateWishlistItem(formData: FormData) {
       memo: optionalString(formData, "memo"),
     })
     .eq("id", wishlistId);
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/");
+  revalidatePath("/wishlist");
+}
+
+export async function toggleWishlistStatus(formData: FormData) {
+  const { supabase, user } = await requireUser();
+  const wishlistId = requiredString(formData, "wishlist_id");
+  await requireOwnWishlist(supabase, wishlistId, user.id);
+
+  const nextStatus = requiredString(formData, "next_status");
+  if (!["considering", "planned", "purchased"].includes(nextStatus)) {
+    throw new Error("잘못된 상태 값입니다.");
+  }
+
+  const { error } = await supabase
+    .from("wishlist_items")
+    .update({ status: nextStatus })
+    .eq("id", wishlistId)
+    .eq("user_id", user.id);
 
   if (error) throw new Error(error.message);
   revalidatePath("/");

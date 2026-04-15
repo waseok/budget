@@ -29,7 +29,18 @@ export async function createSession(userId: string, days = 30): Promise<void> {
   const expiresAt = new Date(Date.now() + days * 86_400_000).toISOString();
 
   const supabase = await createClient();
-  await supabase.from("app_sessions").insert({ user_id: userId, token, expires_at: expiresAt });
+  const { error: sessionInsertError } = await supabase.from("app_sessions").insert({ user_id: userId, token, expires_at: expiresAt });
+
+  if (sessionInsertError) {
+    console.error("[auth.createSession] app_sessions insert failed", {
+      userId,
+      message: sessionInsertError.message,
+      code: sessionInsertError.code,
+      details: sessionInsertError.details,
+      hint: sessionInsertError.hint,
+    });
+    throw new Error(`세션 생성 실패: ${sessionInsertError.message}`);
+  }
 
   const jar = await cookies();
   jar.set(COOKIE, token, {

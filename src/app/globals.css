@@ -316,6 +316,82 @@ button, input, select, textarea { font: inherit; }
 .form-heading { display: grid; gap: 3px; }
 .field-help { margin: -2px 0 0; color: var(--muted); font-size: 0.82rem; line-height: 1.4; }
 
+.wishlist-purchased-panel {
+  display: grid;
+  gap: 10px;
+  max-width: 900px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  padding: 14px;
+}
+.wishlist-purchased-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  border: 0;
+  border-radius: 10px;
+  background: var(--surface-soft);
+  color: var(--text);
+  padding: 10px 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.wishlist-purchased-list { display: grid; gap: 8px; }
+.wishlist-purchased-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #fff;
+}
+.wishlist-purchased-title {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+.wishlist-purchased-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.wishlist-status-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.wishlist-status-toggle.compact { gap: 4px; }
+.status-chip {
+  min-height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.status-chip:hover {
+  border-color: #cbd5e1;
+  color: var(--text);
+}
+.status-chip.active {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: var(--blue);
+}
+
 .toolbar-row { display: grid; grid-template-columns: minmax(0, 1fr) 200px; gap: 10px; }
 
 .form-card label, .budget-edit-form label, .auth-form label { display: grid; gap: 5px; }
@@ -531,4 +607,6 @@ textarea { resize: vertical; }
   .wishlist-footer, .expense-row, .topbar, .hero-actions { flex-direction: column; align-items: flex-start; }
   .toolbar-row, .category-stats { grid-template-columns: 1fr; }
   .donut-wrap { width: 150px; height: 150px; }
+  .wishlist-purchased-item { align-items: flex-start; flex-direction: column; }
+  .wishlist-purchased-actions { justify-content: flex-start; }
 }

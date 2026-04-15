@@ -7,6 +7,7 @@ type WishlistItem = {
   note: string | null;
   expectedPrice: number | null;
   priority: "low" | "medium" | "high";
+  status: "considering" | "planned" | "purchased";
   imageUrl: string | null;
   productUrl: string | null;
 };
@@ -24,6 +25,8 @@ const priorityClasses = {
 };
 
 export function WishlistGrid({ items }: { items: WishlistItem[] }) {
+  const visibleItems = items.filter((item) => item.status !== "purchased");
+
   return (
     <section className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 h-full">
       <div className="flex items-center justify-between mb-5">
@@ -40,11 +43,11 @@ export function WishlistGrid({ items }: { items: WishlistItem[] }) {
           목록 페이지
         </a>
       </div>
-      {items.length === 0 ? (
+      {visibleItems.length === 0 ? (
         <p className="text-sm text-slate-400 py-4 text-center">위시리스트가 비어 있습니다.</p>
       ) : (
         <div className="grid grid-cols-2 gap-3">
-          {items.map((item) => (
+          {visibleItems.map((item) => (
               <article key={item.id} className="overflow-hidden rounded-2xl border border-slate-100 bg-white">
                 <div className="relative aspect-video">
                   <WishlistThumbnail imageUrl={item.imageUrl} title={item.title} />

@@ -47,6 +47,7 @@ export type WishlistItem = {
   note: string | null;
   expectedPrice: number | null;
   priority: "low" | "medium" | "high";
+  status: "considering" | "planned" | "purchased";
   imageUrl: string | null;
   productUrl: string | null;
   categoryId: string | null;
@@ -138,6 +139,7 @@ type RawWishlist = {
   memo: string | null;
   expected_price: number | null;
   priority: "low" | "medium" | "high";
+  status: "considering" | "planned" | "purchased";
   image_url: string | null;
   product_url: string | null;
   category_id: string | null;
@@ -151,6 +153,7 @@ function mapWishlist(raw: unknown[] | null): WishlistItem[] {
       note: item.memo,
       expectedPrice: item.expected_price ? Number(item.expected_price) : null,
       priority: item.priority,
+      status: item.status,
       imageUrl: item.image_url,
       productUrl: item.product_url,
       categoryId: item.category_id,
@@ -196,7 +199,7 @@ export const getWishlistItems = cache(async (userId: string): Promise<WishlistIt
   const supabase = await createClient();
   const { data } = await supabase
     .from("wishlist_items")
-    .select("id, title, memo, expected_price, priority, image_url, product_url, category_id")
+    .select("id, title, memo, expected_price, priority, status, image_url, product_url, category_id")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
     .limit(20);

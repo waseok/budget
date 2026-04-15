@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 
-import { deleteWishlistItem, updateWishlistItem } from "@/app/actions";
+import { deleteWishlistItem, toggleWishlistStatus, updateWishlistItem } from "@/app/actions";
 import { type BudgetForWishlist } from "@/components/forms";
 import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { CurrencyInput } from "@/components/currency-input";
@@ -15,10 +15,37 @@ type WishlistItem = {
   note: string | null;
   expectedPrice: number | null;
   priority: "low" | "medium" | "high";
+  status: "considering" | "planned" | "purchased";
   imageUrl: string | null;
   productUrl: string | null;
   categoryId: string | null;
 };
+
+const statusLabel: Record<WishlistItem["status"], string> = {
+  considering: "고려중",
+  planned: "구매예정",
+  purchased: "구매완료",
+};
+
+function WishlistStatusToggle({ item, compact = false }: { item: WishlistItem; compact?: boolean }) {
+  return (
+    <div className={compact ? "wishlist-status-toggle compact" : "wishlist-status-toggle"}>
+      {(Object.keys(statusLabel) as WishlistItem["status"][]).map((status) => (
+        <form key={status} action={toggleWishlistStatus}>
+          <input type="hidden" name="wishlist_id" value={item.id} />
+          <input type="hidden" name="next_status" value={status} />
+          <button
+            type="submit"
+            className={item.status === status ? "status-chip active" : "status-chip"}
+            aria-label={`${item.title} 상태를 ${statusLabel[status]}으로 변경`}
+          >
+            {statusLabel[status]}
+          </button>
+        </form>
+      ))}
+    </div>
+  );
+}
 
 function WishlistItemRow({ item, budgets }: { item: WishlistItem; budgets: BudgetForWishlist[] }) {
   const initialBudgetId = useMemo(() => {
@@ -42,10 +69,11 @@ function WishlistItemRow({ item, budgets }: { item: WishlistItem; budgets: Budge
         <div className="min-w-0 flex-1">
           <h3>{item.title}</h3>
           <p className="muted">
-            {formatCurrency(item.expectedPrice ?? 0)} · 우선순위 {item.priority}
+            {formatCurrency(item.expectedPrice ?? 0)} · 우선순위 {item.priority} · {statusLabel[item.status]}
           </p>
         </div>
       </div>
+      <WishlistStatusToggle item={item} />
       <form action={updateWishlistItem} className="manager-form">
         <input type="hidden" name="wishlist_id" value={item.id} />
         <label>
@@ -148,6 +176,10 @@ export function WishlistManager({
   items: WishlistItem[];
   budgets: BudgetForWishlist[];
 }) {
+  const activeItems = items.filter((item) => item.status !== "purchased");
+  const purchasedItems = items.filter((item) => item.status === "purchased");
+  const [isPurchasedFolded, setIsPurchasedFolded] = useState(true);
+
   return (
     <section className="section-stack">
       <div className="section-heading">
@@ -157,10 +189,52 @@ export function WishlistManager({
         </div>
       </div>
       <div className="manager-list">
-        {items.map((item) => (
-          <WishlistItemRow key={item.id} item={item} budgets={budgets} />
-        ))}
+        {activeItems.length === 0 ? (
+          <p className="muted">구매 예정 항목이 없습니다. 구매 완료 목록을 확인해보세요.</p>
+        ) : (
+          activeItems.map((item) => (
+            <WishlistItemRow key={item.id} item={item} budgets={budgets} />
+          ))
+        )}
       </div>
+      <section className="wishlist-purchased-panel">
+        <button
+          type="button"
+          className="wishlist-purchased-toggle"
+          onClick={() => setIsPurchasedFolded((prev) => !prev)}
+        >
+          <span>구매 완료 항목 {purchasedItems.length}개</span>
+          <span>{isPurchasedFolded ? "펼치기" : "접기"}</span>
+        </button>
+        {!isPurchasedFolded && (
+          <div className="wishlist-purchased-list">
+            {purchasedItems.length === 0 ? (
+              <p className="muted">아직 구매 완료된 항목이 없습니다.</p>
+            ) : (
+              purchasedItems.map((item) => (
+                <article key={item.id} className="wishlist-purchased-item">
+                  <div className="min-w-0">
+                    <p className="wishlist-purchased-title">{item.title}</p>
+                    <p className="muted">{formatCurrency(item.expectedPrice ?? 0)}</p>
+                  </div>
+                  <div className="wishlist-purchased-actions">
+                    <WishlistStatusToggle item={item} compact />
+                    <form action={deleteWishlistItem}>
+                      <input type="hidden" name="wishlist_id" value={item.id} />
+                      <ConfirmDeleteButton
+                        className="danger-button"
+                        message={`"${item.title}" 항목을 삭제하시겠습니까?`}
+                      >
+                        삭제
+                      </ConfirmDeleteButton>
+                    </form>
+                  </div>
+                </article>
+              ))
+            )}
+          </div>
+        )}
+      </section>
     </section>
   );
 }

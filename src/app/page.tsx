@@ -13,7 +13,9 @@ export default async function HomePage() {
   const totalBudget = data.budgets.reduce((sum, item) => sum + item.totalAmount, 0);
   const totalSpent = categories.reduce((sum, item) => sum + item.spentAmount, 0);
   const totalRemaining = totalBudget - totalSpent;
-  const wishlistBudget = data.wishlistItems.reduce((sum, item) => sum + (item.expectedPrice ?? 0), 0);
+  const wishlistBudget = data.wishlistItems
+    .filter((item) => item.status !== "purchased")
+    .reduce((sum, item) => sum + (item.expectedPrice ?? 0), 0);
   const rawUsage = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
   const usageDisplay = rawUsage === 0 ? "0" : rawUsage < 1 ? "< 1" : Math.round(rawUsage).toString();
 
