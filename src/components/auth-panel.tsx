@@ -4,6 +4,45 @@ import { useActionState, useTransition, useState, useEffect, useRef } from "reac
 
 import { signIn, signUp, getSecurityQuestion, resetPassword } from "@/app/actions";
 
+function PasswordInput({ name, placeholder, autoComplete }: { name: string; placeholder?: string; autoComplete?: string }) {
+  const [show, setShow] = useState(false);
+  return (
+    <div style={{ position: "relative" }}>
+      <input
+        type={show ? "text" : "password"}
+        name={name}
+        placeholder={placeholder}
+        required
+        autoComplete={autoComplete}
+        style={{ paddingRight: 44 }}
+      />
+      <button
+        type="button"
+        onClick={() => setShow((s) => !s)}
+        style={{
+          position: "absolute",
+          right: 10,
+          top: "50%",
+          transform: "translateY(-50%)",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          color: "var(--muted)",
+          padding: 4,
+          display: "flex",
+          alignItems: "center",
+        }}
+        tabIndex={-1}
+        aria-label={show ? "비밀번호 숨기기" : "비밀번호 보기"}
+      >
+        <span className="material-symbols-outlined" style={{ fontSize: 20, fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20" }}>
+          {show ? "visibility_off" : "visibility"}
+        </span>
+      </button>
+    </div>
+  );
+}
+
 const SAVED_ID_KEY = "budget_saved_username";
 
 type Mode = "signin" | "signup" | "forgot";
@@ -118,7 +157,7 @@ export function AuthPanel() {
           </label>
           <label>
             <span>비밀번호</span>
-            <input type="password" name="password" placeholder="비밀번호 입력" required autoComplete="current-password" />
+            <PasswordInput name="password" placeholder="비밀번호 입력" autoComplete="current-password" />
           </label>
           <div className="auth-options">
             <label className="auth-check">
@@ -154,11 +193,11 @@ export function AuthPanel() {
           </label>
           <label>
             <span>비밀번호</span>
-            <input type="password" name="password" placeholder="6자 이상" required autoComplete="new-password" />
+            <PasswordInput name="password" placeholder="6자 이상" autoComplete="new-password" />
           </label>
           <label>
             <span>비밀번호 확인</span>
-            <input type="password" name="confirm_password" placeholder="비밀번호 재입력" required autoComplete="new-password" />
+            <PasswordInput name="confirm_password" placeholder="비밀번호 재입력" autoComplete="new-password" />
           </label>
           <label>
             <span>비밀 질문</span>
@@ -206,11 +245,11 @@ export function AuthPanel() {
               </label>
               <label>
                 <span>새 비밀번호</span>
-                <input type="password" name="new_password" placeholder="6자 이상" required autoComplete="new-password" />
+                <PasswordInput name="new_password" placeholder="6자 이상" autoComplete="new-password" />
               </label>
               <label>
                 <span>비밀번호 확인</span>
-                <input type="password" name="confirm_password" placeholder="비밀번호 재입력" required autoComplete="new-password" />
+                <PasswordInput name="confirm_password" placeholder="비밀번호 재입력" autoComplete="new-password" />
               </label>
               <button type="submit" className="primary-button auth-submit" disabled={resetPending}>
                 {resetPending ? "재설정 중..." : "비밀번호 재설정"}

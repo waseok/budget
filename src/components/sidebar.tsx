@@ -78,12 +78,12 @@ export function Sidebar({ user }: { user?: string | null }) {
 
         {/* Brand */}
         <div className="px-6 pt-8 pb-6">
-          <p className="text-xs font-medium text-slate-400 uppercase tracking-widest mb-1">Premium Wealth Management</p>
+          <p className="text-xs font-medium text-slate-400 tracking-widest mb-1">스마트 예산 관리</p>
           <h2
             className="font-headline text-xl font-medium leading-tight"
             style={{ background: "linear-gradient(135deg, #1d4ed8, #3b82f6)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}
           >
-            Financial Atelier
+            내 가계부
           </h2>
         </div>
 
