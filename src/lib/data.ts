@@ -190,7 +190,7 @@ export const getBudgetsWithCategories = cache(async (user: SessionUser): Promise
 });
 
 export const getBudgetsForWishlist = cache(async (userId: string): Promise<WishlistBudgetOption[]> => {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("budgets")
     .select("id, name, budget_categories(id, name)")
