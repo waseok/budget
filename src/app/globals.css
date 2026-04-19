@@ -426,6 +426,7 @@ input:-webkit-autofill:focus {
   box-shadow: 0 0 0px 1000px #fff inset;
 }
 textarea { resize: vertical; }
+input[type="password"] { font-family: Verdana, Arial, sans-serif; letter-spacing: 0.1em; }
 
 .category-card { display: grid; gap: 12px; }
 .category-top, .category-progress-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
