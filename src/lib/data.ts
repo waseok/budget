@@ -1,7 +1,7 @@
 import { cache } from "react";
 
 import { getSession, type SessionUser } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 // ── Shared types ──────────────────────────────────────────────────────────
 
@@ -178,7 +178,7 @@ export const getCurrentUser = cache(async (): Promise<UserInfo | null> => {
 // ── Page-specific data fetchers ───────────────────────────────────────────
 
 export const getBudgetsWithCategories = cache(async (user: SessionUser): Promise<BudgetItem[]> => {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("budgets")
     .select(
@@ -212,7 +212,7 @@ export const getBudgetsForWishlist = cache(async (userId: string): Promise<Wishl
 
 export const getRecentExpenses = cache(async (categoryIds: string[]): Promise<ExpenseItem[]> => {
   if (categoryIds.length === 0) return [];
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("expenses")
     .select("id, title, amount, spent_on, note, category_id, budget_categories(name, budgets(name))")
@@ -223,7 +223,7 @@ export const getRecentExpenses = cache(async (categoryIds: string[]): Promise<Ex
 });
 
 export const getWishlistItems = cache(async (userId: string): Promise<WishlistItem[]> => {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("wishlist_items")
     .select("id, title, memo, expected_price, priority, status, image_url, product_url, category_id")

@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import { cookies } from "next/headers";
 
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 // ── Password hashing (PBKDF2, Node.js built-in) ───────────────────────────
 
@@ -28,19 +28,8 @@ export async function createSession(userId: string, days = 30): Promise<void> {
   const token = crypto.randomBytes(32).toString("hex");
   const expiresAt = new Date(Date.now() + days * 86_400_000).toISOString();
 
-  const supabase = await createClient();
-  const { error: sessionInsertError } = await supabase.from("app_sessions").insert({ user_id: userId, token, expires_at: expiresAt });
-
-  if (sessionInsertError) {
-    console.error("[auth.createSession] app_sessions insert failed", {
-      userId,
-      message: sessionInsertError.message,
-      code: sessionInsertError.code,
-      details: sessionInsertError.details,
-      hint: sessionInsertError.hint,
-    });
-    throw new Error(`세션 생성 실패: ${sessionInsertError.message}`);
-  }
+  const supabase = createAdminClient();
+  await supabase.from("app_sessions").insert({ user_id: userId, token, expires_at: expiresAt });
 
   const jar = await cookies();
   jar.set(COOKIE, token, {
@@ -57,7 +46,7 @@ export async function getSession(): Promise<SessionUser | null> {
   const token = jar.get(COOKIE)?.value;
   if (!token) return null;
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   const { data } = await supabase
     .from("app_sessions")
     .select("expires_at, app_users(id, username, name)")
@@ -77,7 +66,7 @@ export async function deleteSession(): Promise<void> {
   const jar = await cookies();
   const token = jar.get(COOKIE)?.value;
   if (token) {
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     await supabase.from("app_sessions").delete().eq("token", token);
     jar.delete(COOKIE);
   }
